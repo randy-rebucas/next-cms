@@ -27,24 +27,29 @@ export default function Dashboard() {
   const [recent, setRecent] = useState<Post[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/db/posts").then((r) => r.json()),
-      fetch("/api/db/practice-areas").then((r) => r.json()),
-      fetch("/api/db/testimonials").then((r) => r.json()),
-      fetch("/api/db/faq").then((r) => r.json()),
-      fetch("/api/db/experience").then((r) => r.json()),
-    ]).then(([posts, pa, tl, fq, ex]) => {
-      setStats({
-        posts_total: posts.length,
-        posts_published: posts.filter((p: Post) => p.status === "published").length,
-        posts_draft: posts.filter((p: Post) => p.status === "draft").length,
-        practice_areas: pa.length,
-        testimonials: tl.length,
-        faqs: fq.length,
-        experience: ex.length,
-      });
-      setRecent(posts.slice(0, 5));
-    });
+    (async () => {
+      try {
+        const [posts, pa, tl, fq, ex] = await Promise.all([
+          fetch("/api/db/posts").then((r) => r.json()),
+          fetch("/api/db/practice-areas").then((r) => r.json()),
+          fetch("/api/db/testimonials").then((r) => r.json()),
+          fetch("/api/db/faq").then((r) => r.json()),
+          fetch("/api/db/experience").then((r) => r.json()),
+        ]) as [Post[], unknown[], unknown[], unknown[], unknown[]];
+        setStats({
+          posts_total: posts.length,
+          posts_published: posts.filter((p: Post) => p.status === "published").length,
+          posts_draft: posts.filter((p: Post) => p.status === "draft").length,
+          practice_areas: pa.length,
+          testimonials: tl.length,
+          faqs: fq.length,
+          experience: ex.length,
+        });
+        setRecent(posts.slice(0, 5));
+      } catch {
+        // network or parse error — leave stats as null (skeleton stays visible)
+      }
+    })();
   }, []);
 
   const cards = stats

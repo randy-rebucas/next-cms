@@ -48,7 +48,7 @@ const SECTIONS: Section[] = [
   {
     title: "Admin",
     fields: [
-      { key: "adminPin", label: "Admin PIN (change with care)", type: "password", placeholder: "Leave blank to keep current" },
+      { key: "adminPin", label: "Admin PIN", type: "password", placeholder: "Enter new PIN (leave blank to keep current)" },
       { key: "openaiApiKey", label: "OpenAI API Key", type: "password", placeholder: "sk-…" },
     ],
   },
