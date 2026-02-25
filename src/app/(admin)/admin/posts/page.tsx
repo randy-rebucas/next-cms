@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PlusCircle, Pencil, Trash2, Search } from "lucide-react";
+import { useAdminAuth } from "@/app/(admin)/admin/layout";
 
 interface Post {
   _id: string;
@@ -14,19 +15,18 @@ interface Post {
 }
 
 export default function PostsList() {
+  const { pin } = useAdminAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [filter, setFilter] = useState<"all" | "published" | "draft">("all");
   const [search, setSearch] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  const pin = typeof window !== "undefined" ? sessionStorage.getItem("adminPin") ?? "" : "";
-
   const load = () =>
     fetch(`/api/db/posts?status=${filter}`, { headers: { "x-admin-pin": pin } })
       .then((r) => r.json())
-      .then(setPosts);
+      .then((data: unknown) => { if (Array.isArray(data)) setPosts(data as Post[]); });
 
-  useEffect(() => { load(); }, [filter]);
+  useEffect(() => { if (pin) load(); }, [filter, pin]);
 
   const del = async (id: string) => {
     if (!confirm("Delete this post?")) return;

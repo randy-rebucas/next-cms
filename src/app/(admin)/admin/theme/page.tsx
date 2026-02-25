@@ -194,9 +194,9 @@ export default function ThemeAdmin() {
             style={{ background: theme.bgDark, fontFamily: previewFont(FONT_OPTIONS.find((f) => f.value === theme.fontFamily)?.css ?? "") }}
           >
             <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: theme.primaryColor }}>
-              Law Office
+              Your Site
             </p>
-            <h3 className="text-2xl font-bold mb-3">Your Law Firm Heading</h3>
+            <h3 className="text-2xl font-bold mb-3">Your Heading Here</h3>
             <p className="text-sm opacity-70 mb-5">
               This is how body text appears with your selected font and background color.
             </p>

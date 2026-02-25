@@ -52,21 +52,48 @@ export const useAdminAuth = () => useContext(AuthCtx);
 
 // ── Nav Items ─────────────────────────────────────────────────────────────────
 
-const NAV = [
-  { href: "/admin/dashboard",      label: "Dashboard",      icon: LayoutDashboard },
-  { href: "/admin/posts",          label: "Posts",          icon: FileText },
-  { href: "/admin/pages",          label: "Pages",          icon: Layout },
-  { href: "/admin/media",          label: "Media",          icon: ImageIcon },
-  { href: "/admin/categories",     label: "Categories",     icon: FolderOpen },
-  { href: "/admin/tags",           label: "Tags",           icon: Tag },
-  { href: "/admin/practice-areas", label: "Practice Areas", icon: Briefcase },
-  { href: "/admin/experience",     label: "Experience",     icon: Clock },
-  { href: "/admin/testimonials",   label: "Testimonials",   icon: Star },
-  { href: "/admin/faq",            label: "FAQ",            icon: HelpCircle },
-  { href: "/admin/theme",          label: "Theme",          icon: Palette },
-  { href: "/admin/plugins",        label: "Plugins",        icon: Puzzle },
-  { href: "/admin/users",          label: "Users",          icon: Users },
-  { href: "/admin/settings",       label: "Settings",       icon: Settings },
+// ── Nav Groups ───────────────────────────────────────────────────────────────
+
+const NAV_GROUPS = [
+  {
+    group: null,
+    items: [
+      { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    ],
+  },
+  {
+    group: "Content",
+    items: [
+      { href: "/admin/posts",      label: "Posts",      icon: FileText },
+      { href: "/admin/pages",      label: "Pages",      icon: Layout },
+      { href: "/admin/media",      label: "Media",      icon: ImageIcon },
+      { href: "/admin/categories", label: "Categories", icon: FolderOpen },
+      { href: "/admin/tags",       label: "Tags",       icon: Tag },
+    ],
+  },
+  {
+    group: "Site Features",
+    items: [
+      { href: "/admin/practice-areas", label: "Practice Areas", icon: Briefcase },
+      { href: "/admin/experience",     label: "Experience",     icon: Clock },
+      { href: "/admin/testimonials",   label: "Testimonials",   icon: Star },
+      { href: "/admin/faq",            label: "FAQ",            icon: HelpCircle },
+    ],
+  },
+  {
+    group: "Appearance",
+    items: [
+      { href: "/admin/theme",   label: "Theme",   icon: Palette },
+      { href: "/admin/plugins", label: "Plugins", icon: Puzzle },
+    ],
+  },
+  {
+    group: "System",
+    items: [
+      { href: "/admin/users",    label: "Users",    icon: Users },
+      { href: "/admin/settings", label: "Settings", icon: Settings },
+    ],
+  },
 ];
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
@@ -88,37 +115,46 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
         <div className="flex items-center gap-2 px-5 py-5 border-b border-slate-800">
           <Scale size={20} className="text-amber-500 shrink-0" />
           <span className="text-white font-bold text-base">
-            <span className="text-amber-500">Baligod</span> Law
+            <span className="text-amber-500">next</span>CMS
           </span>
           <button onClick={onClose} className="ml-auto text-slate-500 hover:text-white lg:hidden">
             <X size={16} />
           </button>
         </div>
         <nav className="flex-1 py-4 overflow-y-auto">
-          {NAV.map(({ href, label, icon: Icon }) => {
-            const active =
-              pathname === href ||
-              (href !== "/admin/dashboard" && pathname.startsWith(href));
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={onClose}
-                className={`flex items-center gap-3 px-5 py-2.5 text-sm transition-colors group ${
-                  active
-                    ? "bg-amber-600/15 text-amber-400 border-r-2 border-amber-500"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800"
-                }`}
-              >
-                <Icon
-                  size={16}
-                  className={active ? "text-amber-400" : "text-slate-500 group-hover:text-slate-300"}
-                />
-                {label}
-                {active && <ChevronRight size={14} className="ml-auto text-amber-500/60" />}
-              </Link>
-            );
-          })}
+          {NAV_GROUPS.map(({ group, items }) => (
+            <div key={group ?? "__root"} className="mb-1">
+              {group && (
+                <p className="px-5 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-600 select-none">
+                  {group}
+                </p>
+              )}
+              {items.map(({ href, label, icon: Icon }) => {
+                const active =
+                  pathname === href ||
+                  (href !== "/admin/dashboard" && pathname.startsWith(href));
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={onClose}
+                    className={`flex items-center gap-3 px-5 py-2.5 text-sm transition-colors group ${
+                      active
+                        ? "bg-amber-600/15 text-amber-400 border-r-2 border-amber-500"
+                        : "text-slate-400 hover:text-white hover:bg-slate-800"
+                    }`}
+                  >
+                    <Icon
+                      size={16}
+                      className={active ? "text-amber-400" : "text-slate-500 group-hover:text-slate-300"}
+                    />
+                    {label}
+                    {active && <ChevronRight size={14} className="ml-auto text-amber-500/60" />}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
         <div className="border-t border-slate-800 p-4 space-y-2">
           {ctx.user && (
@@ -160,10 +196,10 @@ function AdminShell({ children }: { children: ReactNode }) {
 
   // Redirect to login if unauthenticated
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (status === "unauthenticated" && pathname !== "/admin/login") {
       router.replace("/admin/login");
     }
-  }, [status, router]);
+  }, [status, router, pathname]);
 
   // After session is established, fetch the legacy admin PIN for backward compat
   useEffect(() => {
@@ -180,6 +216,11 @@ function AdminShell({ children }: { children: ReactNode }) {
       router.replace("/admin/dashboard");
     }
   }, [status, pathname, router]);
+
+  // Login page: render it directly — it manages its own UI
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
 
   if (status === "loading" || status === "unauthenticated") {
     return (
@@ -214,7 +255,7 @@ function AdminShell({ children }: { children: ReactNode }) {
             <Menu size={20} />
           </button>
           <span className="text-sm text-slate-400">
-            {NAV.find(
+            {NAV_GROUPS.flatMap((g) => g.items).find(
               (n) =>
                 pathname === n.href ||
                 (n.href !== "/admin/dashboard" && pathname.startsWith(n.href))

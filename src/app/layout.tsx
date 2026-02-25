@@ -18,14 +18,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Atty. Levito 'Levi' Baligod | Anti-Corruption Lawyer Philippines",
-  description:
-    "Atty. Levito 'Levi' Baligod is a Filipino anti-corruption lawyer and public interest advocate known for representing PDAF scam whistleblowers and filing malversation cases against public officials.",
-  keywords:
-    "Levi Baligod, Filipino lawyer, anti-corruption, PDAF scam, pork barrel, public interest litigation, criminal law Philippines",
+  title: "nextCMS",
+  description: "Powered by nextCMS",
 };
 
 async function getThemeCss(): Promise<string> {
+  // Skip DB call entirely if setup hasn't been completed yet
+  if (process.env.SETUP_COMPLETE !== "true") return "";
   try {
     await connectDB();
     const row = await Setting.findOne({ key: "siteTheme" }).lean() as { value?: unknown } | null;
@@ -46,9 +45,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isSetupDone = process.env.SETUP_COMPLETE === "true";
   const [themeCss, { scripts: headScripts }] = await Promise.all([
     getThemeCss(),
-    triggerHook("filterHeadScripts", { scripts: [] }),
+    isSetupDone
+      ? triggerHook("filterHeadScripts", { scripts: [] })
+      : Promise.resolve({ scripts: [] as string[] }),
   ]);
 
   return (

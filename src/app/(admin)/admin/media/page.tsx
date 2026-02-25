@@ -34,7 +34,7 @@ export default function MediaAdmin() {
   const load = useCallback(() =>
     fetch("/api/media", { headers: { "x-admin-pin": pin } })
       .then((r) => r.json())
-      .then(setItems)
+      .then((data: unknown) => { if (Array.isArray(data)) setItems(data as MediaItem[]); })
       .catch(() => {}),
   [pin]);
 

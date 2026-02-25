@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FileText, Briefcase, Star, HelpCircle, Clock, PlusCircle, Settings } from "lucide-react";
+import { FileText, Briefcase, Star, HelpCircle, Clock, PlusCircle, Settings, Layout, Image as ImageIcon } from "lucide-react";
 import { useAdminAuth } from "@/app/(admin)/admin/layout";
 
 interface Stats {
   posts_total: number;
   posts_published: number;
   posts_draft: number;
+  pages: number;
+  media: number;
   practice_areas: number;
   testimonials: number;
   faqs: number;
@@ -33,17 +35,21 @@ export default function Dashboard() {
     (async () => {
       try {
         const h = { "x-admin-pin": pin };
-        const [posts, pa, tl, fq, ex] = await Promise.all([
+        const [posts, pages, media, pa, tl, fq, ex] = await Promise.all([
           fetch("/api/db/posts", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/pages", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/media", { headers: h }).then((r) => r.json()),
           fetch("/api/db/practice-areas", { headers: h }).then((r) => r.json()),
           fetch("/api/db/testimonials", { headers: h }).then((r) => r.json()),
           fetch("/api/db/faq", { headers: h }).then((r) => r.json()),
           fetch("/api/db/experience", { headers: h }).then((r) => r.json()),
-        ]) as [Post[], unknown[], unknown[], unknown[], unknown[]];
+        ]) as [Post[], unknown[], unknown[], unknown[], unknown[], unknown[], unknown[]];
         setStats({
           posts_total: posts.length,
           posts_published: posts.filter((p: Post) => p.status === "published").length,
           posts_draft: posts.filter((p: Post) => p.status === "draft").length,
+          pages: Array.isArray(pages) ? pages.length : 0,
+          media: Array.isArray(media) ? media.length : 0,
           practice_areas: pa.length,
           testimonials: tl.length,
           faqs: fq.length,
@@ -59,6 +65,8 @@ export default function Dashboard() {
   const cards = stats
     ? [
         { label: "Posts", value: stats.posts_total, sub: `${stats.posts_published} published · ${stats.posts_draft} drafts`, icon: FileText, color: "text-amber-400", href: "/admin/posts" },
+        { label: "Pages", value: stats.pages, sub: "Published pages", icon: Layout, color: "text-cyan-400", href: "/admin/pages" },
+        { label: "Media", value: stats.media, sub: "Uploaded files", icon: ImageIcon, color: "text-indigo-400", href: "/admin/media" },
         { label: "Practice Areas", value: stats.practice_areas, sub: "Active services", icon: Briefcase, color: "text-blue-400", href: "/admin/practice-areas" },
         { label: "Testimonials", value: stats.testimonials, sub: "Client reviews", icon: Star, color: "text-green-400", href: "/admin/testimonials" },
         { label: "FAQs", value: stats.faqs, sub: "Answered questions", icon: HelpCircle, color: "text-purple-400", href: "/admin/faq" },
@@ -70,7 +78,7 @@ export default function Dashboard() {
     <div className="max-w-5xl">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-        <p className="text-slate-400 text-sm mt-1">Welcome to Baligod Law CMS</p>
+        <p className="text-slate-400 text-sm mt-1">Welcome to nextCMS</p>
       </div>
 
       {/* Quick actions */}
@@ -81,6 +89,13 @@ export default function Dashboard() {
         >
           <PlusCircle size={16} />
           New Post
+        </Link>
+        <Link
+          href="/admin/pages/new"
+          className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
+        >
+          <Layout size={16} />
+          New Page
         </Link>
         <Link
           href="/admin/settings"

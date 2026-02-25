@@ -17,12 +17,12 @@ import {
 import type { Role } from "@/core/rbac";
 
 interface UserRow {
-  id: number;
+  _id: string;
   name: string;
   email: string;
   role: Role;
   permissions: string[];
-  created_at: string;
+  createdAt: string;
 }
 
 const ROLE_LABELS: Record<Role, { label: string; color: string; icon: React.ReactNode }> = {
@@ -93,7 +93,7 @@ export default function UsersPage() {
   const save = async () => {
     setSaving(true);
     const isNew = modal === "create";
-    const url = isNew ? "/api/users" : `/api/users/${form.id}`;
+    const url = isNew ? "/api/users" : `/api/users/${form._id}`;
     const method = isNew ? "POST" : "PUT";
     const body = { ...form };
     if (!isNew && !body.password) delete body.password;
@@ -115,7 +115,7 @@ export default function UsersPage() {
     setSaving(false);
   };
 
-  const deleteUser = async (id: number) => {
+  const deleteUser = async (id: string) => {
     if (!confirm("Delete this user?")) return;
     const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
     if (res.ok) {
@@ -172,7 +172,7 @@ export default function UsersPage() {
               {users.map((u) => {
                 const roleMeta = ROLE_LABELS[u.role];
                 return (
-                  <tr key={u.id} className="border-b border-slate-800 last:border-0 hover:bg-slate-800/40 transition-colors">
+                  <tr key={u._id} className="border-b border-slate-800 last:border-0 hover:bg-slate-800/40 transition-colors">
                     <td className="px-4 py-3 text-white font-medium">{u.name}</td>
                     <td className="px-4 py-3 text-slate-400">{u.email}</td>
                     <td className="px-4 py-3">
@@ -182,7 +182,7 @@ export default function UsersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-slate-500 text-xs">
-                      {new Date(u.created_at).toLocaleDateString()}
+                      {new Date(u.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -193,7 +193,7 @@ export default function UsersPage() {
                           <Pencil size={14} />
                         </button>
                         <button
-                          onClick={() => deleteUser(u.id)}
+                          onClick={() => deleteUser(u._id)}
                           className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-950/30 rounded transition-colors"
                         >
                           <Trash2 size={14} />

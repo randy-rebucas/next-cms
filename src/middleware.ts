@@ -29,24 +29,50 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protect admin UI routes
-  if (pathname.startsWith("/admin")) {
-    const session = await auth();
-    if (!session) {
-      const loginUrl = new URL("/admin/login", req.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
+  // ── Setup gate ──────────────────────────────────────────────────────────
+  // Setup API routes are always accessible (the wizard calls them)
+  if (pathname.startsWith("/api/setup")) {
+    return NextResponse.next();
   }
 
-  // Protect users API endpoint — require session
-  if (pathname.startsWith("/api/users")) {
+  const isSetupDone = process.env.SETUP_COMPLETE === "true";
+
+  if (!isSetupDone) {
+    // Allow access to the setup wizard itself; redirect everything else
+    if (pathname.startsWith("/setup")) {
+      return NextResponse.next();
+    }
+    return NextResponse.redirect(new URL("/setup", req.url));
+  }
+
+  // If setup is complete and someone navigates to /setup, send them home
+  if (pathname.startsWith("/setup")) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+  // ── End setup gate ───────────────────────────────────────────────────────
+
+  // Protect admin UI routes and admin-facing API endpoints with a single session check
+  const needsAuth =
+    pathname.startsWith("/admin") || pathname.startsWith("/api/users");
+
+  if (needsAuth) {
     const session = await auth();
-    if (!session) {
-      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
+
+    if (pathname.startsWith("/admin")) {
+      if (!session) {
+        const loginUrl = new URL("/admin/login", req.url);
+        loginUrl.searchParams.set("callbackUrl", pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+    }
+
+    if (pathname.startsWith("/api/users")) {
+      if (!session) {
+        return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
     }
   }
 

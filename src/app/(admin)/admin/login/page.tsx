@@ -1,17 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Scale, Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@baligod.law");
+  const { status } = useSession();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
+
+  // If already logged in, send to dashboard
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/admin/dashboard");
+    }
+  }, [status, router]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,10 +33,10 @@ export default function AdminLoginPage() {
     });
     if (res?.error) {
       setError("Invalid email or password.");
+      setLoading(false);
     } else {
       router.replace("/admin/dashboard");
     }
-    setLoading(false);
   };
 
   return (
@@ -39,7 +47,7 @@ export default function AdminLoginPage() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-600/20 border border-amber-600/30 mb-4">
             <Scale className="text-amber-400" size={26} />
           </div>
-          <h1 className="text-xl font-bold text-white">Baligod Law Admin</h1>
+          <h1 className="text-xl font-bold text-white">nextCMS Admin</h1>
           <p className="text-slate-500 text-sm mt-1">Sign in to continue</p>
         </div>
 
