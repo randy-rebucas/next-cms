@@ -134,9 +134,9 @@ export default function Blog({ posts = defaultPosts }: { posts?: BlogPost[] }) {
         </div>
 
         <div className="text-center mt-10">
-          <button className="px-8 py-3 border-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white font-semibold rounded-xl transition-colors">
+          <a href="/#blog" className="inline-block px-8 py-3 border-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white font-semibold rounded-xl transition-colors">
             View All Articles
-          </button>
+          </a>
         </div>
       </div>
     </section>

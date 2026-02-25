@@ -25,7 +25,7 @@ function AiFaqHint({ pin }: { pin: string }) {
     const res = await fetch("/api/ai/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-admin-pin": pin },
-      body: JSON.stringify({ type: "faq_answer", topic: q }),
+      body: JSON.stringify({ type: "faq_answer", prompt: q }),
     });
     const j = await res.json() as { content?: string; error?: string };
     setAns(j.content ?? j.error ?? "Error generating answer.");

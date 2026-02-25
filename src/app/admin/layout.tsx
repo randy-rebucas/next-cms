@@ -38,15 +38,21 @@ const NAV = [
 
 // ── Login Screen ─────────────────────────────────────────────────────────────
 
-function LoginScreen({ onLogin }: { onLogin: (pin: string) => void }) {
+function LoginScreen({ onLogin }: { onLogin: (pin: string) => Promise<boolean> }) {
   const [val, setVal] = useState("");
   const [error, setError] = useState(false);
+  const [checking, setChecking] = useState(false);
 
-  const attempt = () => {
-    if (!val) return;
-    onLogin(val);
-    setError(true);
-    setTimeout(() => setError(false), 1200);
+  const attempt = async () => {
+    if (!val || checking) return;
+    setChecking(true);
+    setError(false);
+    const ok = await onLogin(val);
+    if (!ok) {
+      setError(true);
+      setTimeout(() => setError(false), 1500);
+    }
+    setChecking(false);
   };
 
   return (
@@ -73,14 +79,16 @@ function LoginScreen({ onLogin }: { onLogin: (pin: string) => void }) {
               error ? "border-red-500 focus:border-red-500" : "border-slate-600 focus:border-amber-500"
             }`}
           />
+          {error && <p className="text-red-400 text-xs mb-3">Incorrect PIN. Try again.</p>}
           <button
             onClick={attempt}
-            className="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-3 rounded-lg transition-colors"
+            disabled={checking}
+            className="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60"
           >
-            Log In
+            {checking ? "Verifying…" : "Log In"}
           </button>
           <p className="text-slate-600 text-xs text-center mt-4">
-            Default PIN: 1234 &bull; Set ADMIN_PIN env var to change
+            Default PIN: 1234 &bull; Change in Admin → Settings
           </p>
         </div>
       </div>
@@ -177,12 +185,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     setPin(stored ?? ""); // null (nothing stored) → "" = show login
   }, []);
 
-  const doLogin = async (attempt: string) => {
-    // Verify against the API
-    const res = await fetch("/api/db/settings", {
-      headers: { "x-admin-pin": attempt },
-    });
-    // Settings GET doesn't require auth — so to verify PIN we try a no-op PUT
+  const doLogin = async (attempt: string): Promise<boolean> => {
     const verifyRes = await fetch("/api/db/settings", {
       method: "PUT",
       headers: { "Content-Type": "application/json", "x-admin-pin": attempt },
@@ -191,9 +194,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     if (verifyRes.ok) {
       sessionStorage.setItem("adminPin", attempt);
       setPin(attempt);
-    } else {
-      // wrong pin — stay on login
+      return true;
     }
+    return false;
   };
 
   const logout = () => {
@@ -202,17 +205,20 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     router.push("/admin");
   };
 
+  useEffect(() => {
+    if (pin && pathname === "/admin") {
+      router.replace("/admin/dashboard");
+    }
+  }, [pin, pathname, router]);
+
   // Still loading from sessionStorage
   if (pin === null) return null;
 
   // Not authenticated
   if (!pin) return <LoginScreen onLogin={doLogin} />;
 
-  // Redirect /admin → /admin/dashboard
-  if (pathname === "/admin") {
-    router.replace("/admin/dashboard");
-    return null;
-  }
+  // Redirect /admin → /admin/dashboard (handled in useEffect above)
+  if (pathname === "/admin") return null;
 
   return (
     <AuthCtx.Provider value={{ pin, logout }}>
