@@ -1,17 +1,26 @@
 import { NextRequest } from "next/server";
-import db from "@/lib/db";
-import { checkPin, ok, err } from "@/lib/api";
+import connectDB from "@/lib/mongoose";
+import { FAQ } from "@/models/FAQ";
+import { checkPin, ok, err } from "@/core/auth";
 
 export async function GET() {
-  return ok(db.prepare("SELECT * FROM faqs ORDER BY sort_order").all());
+  await connectDB();
+  const rows = await FAQ.find({ status: "published" }).sort({ sort_order: 1 }).lean();
+  return ok(rows);
 }
 
 export async function POST(req: NextRequest) {
-  const denied = checkPin(req);
+  const denied = await checkPin(req);
   if (denied) return denied;
-  const { question, answer = "" } = await req.json();
+
+  const { question, answer = "", sort_order = 0 } = await req.json();
   if (!question) return err("question is required");
-  const max = (db.prepare("SELECT MAX(sort_order) as m FROM faqs").get() as { m: number | null }).m ?? -1;
-  const info = db.prepare("INSERT INTO faqs (question,answer,sort_order) VALUES (?,?,?)").run(question, answer, max + 1);
-  return ok(db.prepare("SELECT * FROM faqs WHERE id=?").get(info.lastInsertRowid));
+
+  await connectDB();
+  try {
+    const doc = await FAQ.create({ question, answer, sort_order });
+    return ok(doc.toObject());
+  } catch (e) {
+    return err(String(e));
+  }
 }

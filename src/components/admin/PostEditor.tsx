@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
 import { Save, Eye, EyeOff, Sparkles, ArrowLeft, Loader2, Link2, X } from "lucide-react";
 import Link from "next/link";
-import { useAdminAuth } from "@/app/admin/layout";
-
-const TipTapEditor = dynamic(() => import("@/components/admin/TipTapEditor"), { ssr: false });
+import { useAdminAuth } from "@/app/(admin)/admin/layout";
+import BlockEditor from "@/components/admin/BlockEditor";
 
 interface PostData {
   id?: number;
@@ -233,10 +231,10 @@ export default function PostEditor({ initial }: { initial?: Partial<PostData> })
             {aiError && <span className="text-xs text-red-400 self-center">{aiError}</span>}
           </div>
 
-          {/* TipTap editor */}
-          <TipTapEditor
-            content={data.content}
-            onChange={(html) => set("content", html)}
+          {/* Block editor */}
+          <BlockEditor
+            value={data.content}
+            onChange={(val) => set("content", val)}
             placeholder="Write your post content here, or use Generate with AI above…"
           />
 

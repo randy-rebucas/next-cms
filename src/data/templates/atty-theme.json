@@ -1,0 +1,414 @@
+{
+  "name": "atty-theme",
+  "label": "Atty. Levi Baligod – Law Firm",
+  "version": "1.0.0",
+  "description": "Starter content template for Atty. Levito \"Levi\" Baligod's anti-corruption law firm website.",
+  "data": {
+    "site": {
+      "name": "Atty. Levito",
+      "nameHighlight": "\"Levi\" Baligod",
+      "title": "Anti-Corruption Lawyer & Public Interest Advocate",
+      "tagline": "Accepting New Clients",
+      "description": "Over 25 years of fighting for accountability and justice in the Philippines. Known nationally for representing PDAF scam whistleblowers and filing malversation cases against corrupt public officials.",
+      "stats": [
+        { "value": "25+", "label": "Years Experience" },
+        { "value": "2000", "label": "Bar Passer" },
+        { "value": "₱10B+", "label": "Public Funds Exposed" }
+      ],
+      "credentials": "UP Economics & Pol. Sci. · San Beda / UE School of Law · Bar 2000",
+      "badges": ["PDAF Scam Counsel", "Senate Candidate 2016", "IBP Member", "Anti-Corruption Advocate"],
+      "bio": "Atty. Levito \"Levi\" Baligod is a Filipino lawyer and public interest advocate who has dedicated his career to fighting corruption and holding public officials accountable under Philippine law. A graduate of the University of the Philippines and a 2000 bar passer, he has become one of the country's most recognized voices in anti-corruption litigation.",
+      "bioExtended": "He rose to national prominence as lead counsel for the whistleblowers in the Priority Development Assistance Fund (PDAF) or 'pork barrel' scam — one of the biggest corruption scandals in Philippine history, involving the alleged misuse of billions in public funds by legislators in connivance with businesswoman Janet Lim-Napoles. Baligod has filed malversation and plunder complaints against numerous former and incumbent lawmakers and continues to pursue accountability in the Sandiganbayan and other courts. In February 2026, he appeared at a press conference presenting new corruption allegations involving infrastructure projects and testimony from former military personnel.",
+      "highlightStats": [
+        { "icon": "Award", "value": "25+", "label": "Years of Practice" },
+        { "icon": "BookOpen", "value": "2000", "label": "Bar Exam Passer" },
+        { "icon": "Users", "value": "₱10B+", "label": "Public Funds Exposed" },
+        { "icon": "Briefcase", "value": "100+", "label": "Corruption Cases Filed" }
+      ],
+      "phone": "+63 (2) 9XX-XXXX",
+      "phoneHref": "tel:+6329XXXXXXX",
+      "email": "levi@baligodlaw.ph",
+      "emailHref": "mailto:levi@baligodlaw.ph",
+      "address": "Quezon City, Metro Manila\nPhilippines",
+      "mapAddress": "Quezon City, Metro Manila",
+      "mapAddress2": "Philippines",
+      "hours": "Mon–Fri: 9 AM – 5 PM\nSat: By Appointment",
+      "contactDescription": "Have a legal concern or want to discuss a case? Reach out and Atty. Levi will respond within 24 hours.",
+      "footerDescription": "Anti-corruption lawyer and public interest advocate fighting for government accountability and the rights of Filipinos.",
+      "metaTitle": "Atty. Levito 'Levi' Baligod | Anti-Corruption Lawyer Philippines",
+      "metaDescription": "Atty. Levito 'Levi' Baligod is a Filipino anti-corruption lawyer and public interest advocate known for representing PDAF scam whistleblowers and filing malversation cases against public officials."
+    },
+    "practiceAreas": [
+      {
+        "icon": "🔍",
+        "title": "Anti-Corruption & Graft",
+        "description": "Filing and prosecuting cases of graft, corruption, malversation, and plunder before the Sandiganbayan, Ombudsman, and other bodies. Holding public officials accountable for misuse of government funds.",
+        "bullets": ["PDAF / Pork Barrel Cases", "Malversation of Public Funds", "Plunder Complaints", "Ombudsman Proceedings"],
+        "color": "border-amber-500",
+        "bg": "bg-amber-50",
+        "sort_order": 1,
+        "status": "published"
+      },
+      {
+        "icon": "⚖️",
+        "title": "Criminal Defense & Prosecution",
+        "description": "Representing clients in serious criminal matters before Philippine Regional Trial Courts, the Sandiganbayan, and the Court of Appeals — both as defense counsel and as private complainant.",
+        "bullets": ["Criminal Complaints Filing", "Sandiganbayan Litigation", "Criminal Defense (RTC)", "Private Prosecution"],
+        "color": "border-red-500",
+        "bg": "bg-red-50",
+        "sort_order": 2,
+        "status": "published"
+      },
+      {
+        "icon": "🏛",
+        "title": "Public Interest Litigation",
+        "description": "Pursuing cases that serve the broader public good — whistleblower protection, government transparency, and accountability of public officials and government-owned corporations.",
+        "bullets": ["Whistleblower Representation", "Government Transparency Cases", "Public Accountability Suits", "Constitutional Petitions"],
+        "color": "border-blue-500",
+        "bg": "bg-blue-50",
+        "sort_order": 3,
+        "status": "published"
+      },
+      {
+        "icon": "🏗️",
+        "title": "Infrastructure & Procurement Law",
+        "description": "Investigating and litigating irregularities in government procurement, infrastructure contracts, and public works projects, including anomalous bidding and overpriced contracts.",
+        "bullets": ["Procurement Fraud", "Infrastructure Contract Disputes", "COA Referrals", "Bidding Irregularities"],
+        "color": "border-green-500",
+        "bg": "bg-green-50",
+        "sort_order": 4,
+        "status": "published"
+      },
+      {
+        "icon": "📜",
+        "title": "Civil Litigation",
+        "description": "Handling civil disputes involving contracts, property, damages, and other private legal matters before Philippine trial courts and appellate bodies.",
+        "bullets": ["Contract Disputes", "Property & Real Estate", "Damages Claims", "Court of Appeals Appeals"],
+        "color": "border-purple-500",
+        "bg": "bg-purple-50",
+        "sort_order": 5,
+        "status": "published"
+      },
+      {
+        "icon": "📰",
+        "title": "Political & Electoral Law",
+        "description": "Advising on matters of electoral law, political party regulations, campaign finance, and election-related complaints before COMELEC and other electoral bodies.",
+        "bullets": ["COMELEC Proceedings", "Election Protests", "Campaign Finance", "Political Accountability"],
+        "color": "border-teal-500",
+        "bg": "bg-teal-50",
+        "sort_order": 6,
+        "status": "published"
+      }
+    ],
+    "experience": [
+      {
+        "year": "1990s",
+        "title": "University of the Philippines",
+        "subtitle": "B.A. Economics & Political Science",
+        "description": "Graduated from UP with a double degree in Economics and Political Science, building a strong foundation in public policy, governance, and the relationship between law and society.",
+        "sort_order": 1
+      },
+      {
+        "year": "Late 1990s",
+        "title": "San Beda & University of the East",
+        "subtitle": "LL.B. – School of Law",
+        "description": "Pursued his law degree at San Beda College of Law and continued at the University of the East School of Law, developing expertise in criminal law, constitutional law, and public accountability.",
+        "sort_order": 2
+      },
+      {
+        "year": "2000",
+        "title": "Philippine Bar Examinations",
+        "subtitle": "Roll of Attorneys – Supreme Court of the Philippines",
+        "description": "Passed the Philippine Bar Examinations and was admitted to the Roll of Attorneys, authorizing him to practice law before all courts and quasi-judicial bodies in the Philippines.",
+        "sort_order": 3
+      },
+      {
+        "year": "2000–2012",
+        "title": "Private Legal Practice",
+        "subtitle": "Criminal, Civil & Public Interest Cases",
+        "description": "Built a practice focusing on criminal defense, civil litigation, and public interest cases before Philippine Regional Trial Courts, the Court of Appeals, and the Sandiganbayan.",
+        "sort_order": 4
+      },
+      {
+        "year": "2013",
+        "title": "PDAF Scam – Lead Whistleblower Counsel",
+        "subtitle": "Priority Development Assistance Fund Scandal",
+        "description": "Became nationally prominent as the lead attorney for whistleblowers in the PDAF or 'pork barrel' scam — one of the largest corruption scandals in Philippine history — involving alleged misuse of billions in public funds by legislators and businesswoman Janet Lim-Napoles.",
+        "sort_order": 5
+      },
+      {
+        "year": "2013–Present",
+        "title": "Anti-Corruption Litigation",
+        "subtitle": "Malversation & Plunder Cases",
+        "description": "Filed numerous malversation, plunder, and criminal complaints before the Office of the Ombudsman and the Sandiganbayan against former and incumbent lawmakers and government officials implicated in corruption schemes.",
+        "sort_order": 6
+      },
+      {
+        "year": "2016",
+        "title": "Philippine Senate Campaign",
+        "subtitle": "Independent Candidate – Anti-Corruption Platform",
+        "description": "Ran as an independent candidate for the Philippine Senate on a dedicated anti-corruption platform, bringing national attention to systemic issues of graft and government accountability.",
+        "sort_order": 7
+      },
+      {
+        "year": "Feb 2026",
+        "title": "Infrastructure Corruption Allegations",
+        "subtitle": "Press Conference – Military Affidavits",
+        "description": "Presented new allegations of corruption in connection with infrastructure projects at a press conference, supported by affidavits from former military personnel and related to ongoing international inquiries.",
+        "sort_order": 8
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "R. dela Cruz",
+        "case_type": "PDAF Whistleblower Client",
+        "rating": 5,
+        "text": "Atty. Levi stood by us when no one else would. He guided us through the entire process of coming forward against powerful politicians. His courage gave us courage.",
+        "initials": "RC",
+        "color": "bg-blue-600",
+        "status": "published"
+      },
+      {
+        "name": "M. Santos",
+        "case_type": "Criminal Defense",
+        "rating": 5,
+        "text": "I was facing trumped-up charges for exposing anomalies in our local government. Atty. Baligod took my case and fought aggressively until all charges were dismissed.",
+        "initials": "MS",
+        "color": "bg-rose-600",
+        "status": "published"
+      },
+      {
+        "name": "J. Reyes",
+        "case_type": "Malversation Case",
+        "rating": 5,
+        "text": "He filed the complaint against the official who stole our barangay funds. What seemed impossible — going up against someone with political connections — Atty. Levi made it happen.",
+        "initials": "JR",
+        "color": "bg-green-600",
+        "status": "published"
+      },
+      {
+        "name": "Civil Society Organization",
+        "case_type": "Public Interest Litigation",
+        "rating": 5,
+        "text": "We engaged Atty. Baligod for a petition challenging a government contract. His command of administrative and constitutional law was exceptional. Highly recommended.",
+        "initials": "CS",
+        "color": "bg-purple-600",
+        "status": "published"
+      },
+      {
+        "name": "A. Villanueva",
+        "case_type": "Infrastructure Fraud Case",
+        "rating": 5,
+        "text": "Atty. Levi helped us document and file a complaint on a severely overpriced government infrastructure project in our province. He is thorough, brave, and relentless.",
+        "initials": "AV",
+        "color": "bg-amber-600",
+        "status": "published"
+      },
+      {
+        "name": "Former Government Employee",
+        "case_type": "Whistleblower Protection",
+        "rating": 5,
+        "text": "After I decided to expose anomalies in my agency, I feared for my safety. Atty. Baligod advised and protected me every step of the way. I never felt alone.",
+        "initials": "GE",
+        "color": "bg-teal-600",
+        "status": "published"
+      }
+    ],
+    "faq": [
+      {
+        "question": "How does a free consultation work?",
+        "answer": "During your free initial consultation, we review the facts of your case, explain your legal options under Philippine law, and outline a potential strategy. There is no obligation to hire us. You may book online, by phone, or in person at our Quezon City office.",
+        "sort_order": 1,
+        "status": "published"
+      },
+      {
+        "question": "What is the difference between plunder and malversation?",
+        "answer": "Malversation (Article 217, Revised Penal Code) involves a public officer misappropriating public funds entrusted to them. Plunder (RA 7080) involves a public officer amassing ill-gotten wealth of at least ₱50 million through a series of overt criminal acts. Plunder carries a heavier penalty including reclusion perpetua.",
+        "sort_order": 2,
+        "status": "published"
+      },
+      {
+        "question": "Who can file a complaint before the Ombudsman?",
+        "answer": "Any person can file a complaint before the Office of the Ombudsman against a public official or employee for acts related to their official duties, including graft, corruption, and misconduct. The complaint must be supported by affidavits and documentary evidence.",
+        "sort_order": 3,
+        "status": "published"
+      },
+      {
+        "question": "What is the Sandiganbayan and what cases does it handle?",
+        "answer": "The Sandiganbayan is a special anti-graft court in the Philippines with jurisdiction over criminal and civil cases involving public officials with Salary Grade 27 and above, charged with violations of the Anti-Graft and Corrupt Practices Act (RA 3019), plunder, malversation, and related offenses.",
+        "sort_order": 4,
+        "status": "published"
+      },
+      {
+        "question": "How long do I have to file a criminal complaint in the Philippines?",
+        "answer": "Prescriptive periods vary: plunder – 20 years; malversation – depends on the penalty, typically 10–20 years; violations of RA 3019 (anti-graft) – 15 years from discovery. It is critical to consult an attorney as soon as possible to avoid missing filing deadlines.",
+        "sort_order": 5,
+        "status": "published"
+      },
+      {
+        "question": "Can I remain anonymous when reporting corruption?",
+        "answer": "While complaints generally require identification, the Ombudsman has mechanisms to protect whistleblowers. Republic Act No. 6981 (Witness Protection Program) provides protection for those who testify against public officials. Atty. Baligod specializes in guiding whistleblowers through this process safely.",
+        "sort_order": 6,
+        "status": "published"
+      },
+      {
+        "question": "What is the PDAF or 'pork barrel' scam?",
+        "answer": "The Priority Development Assistance Fund (PDAF) scam involved legislators allegedly channeling their discretionary government funds through Janet Lim-Napoles' network of fake NGOs, siphoning billions in public money. Atty. Baligod served as lead counsel for the key government whistleblowers in these landmark cases.",
+        "sort_order": 7,
+        "status": "published"
+      },
+      {
+        "question": "How do I know if I have a strong anti-corruption case?",
+        "answer": "A strong case requires: (1) clear evidence of a public official's act or omission; (2) proof of damage to government or unjust enrichment; (3) documentary evidence such as contracts, receipts, COA reports, or audit findings; and (4) a complaint filed within the prescriptive period. A consultation with Atty. Baligod can help assess your specific situation.",
+        "sort_order": 8,
+        "status": "published"
+      }
+    ],
+    "posts": [
+      {
+        "title": "What Is the PDAF Scam and Why Does It Still Matter in 2026?",
+        "slug": "pdaf-scam-explainer-2026",
+        "excerpt": "The Priority Development Assistance Fund scandal exposed how billions in public funds were allegedly diverted through fake NGOs. Here is a comprehensive explainer on the case, its key figures, and where it stands today.",
+        "status": "published",
+        "type": "post",
+        "author_name": "Atty. Levi Baligod",
+        "tag_css": "bg-amber-100 text-amber-700",
+        "read_time": "8 min read",
+        "meta": {
+          "meta_title": "What Is the PDAF Scam and Why Does It Still Matter in 2026?",
+          "meta_description": "The Priority Development Assistance Fund scandal exposed how billions in public funds were allegedly diverted through fake NGOs. Here is a comprehensive explainer.",
+          "category_name": "Anti-Corruption"
+        },
+        "content": [
+          {
+            "type": "paragraph",
+            "content": "The Priority Development Assistance Fund (PDAF) scam is one of the most significant corruption scandals in Philippine history..."
+          }
+        ]
+      },
+      {
+        "title": "Plunder vs. Malversation: Key Differences Every Filipino Should Know",
+        "slug": "plunder-vs-malversation-philippines",
+        "excerpt": "Two of the most serious offenses public officials face in the Philippines are plunder and malversation of public funds. Understanding the difference can make or break a corruption case.",
+        "status": "published",
+        "type": "post",
+        "author_name": "Atty. Levi Baligod",
+        "tag_css": "bg-red-100 text-red-700",
+        "read_time": "6 min read",
+        "meta": {
+          "meta_title": "Plunder vs. Malversation: Key Differences Every Filipino Should Know",
+          "meta_description": "Two of the most serious offenses public officials face in the Philippines are plunder and malversation of public funds.",
+          "category_name": "Criminal Law PH"
+        },
+        "content": [
+          {
+            "type": "paragraph",
+            "content": "Understanding the distinction between plunder and malversation is critical in anti-corruption litigation in the Philippines..."
+          }
+        ]
+      },
+      {
+        "title": "Your Rights as a Whistleblower Under Philippine Law",
+        "slug": "whistleblower-rights-philippines",
+        "excerpt": "Coming forward against corrupt officials is one of the most courageous acts a Filipino can take. This guide explains the legal protections, risks, and steps involved in becoming a state witness or whistleblower.",
+        "status": "published",
+        "type": "post",
+        "author_name": "Atty. Levi Baligod",
+        "tag_css": "bg-blue-100 text-blue-700",
+        "read_time": "7 min read",
+        "meta": {
+          "meta_title": "Your Rights as a Whistleblower Under Philippine Law",
+          "meta_description": "This guide explains the legal protections, risks, and steps involved in becoming a state witness or whistleblower in the Philippines.",
+          "category_name": "Whistleblower Rights"
+        },
+        "content": [
+          {
+            "type": "paragraph",
+            "content": "Republic Act No. 6981, the Witness Protection, Security and Benefit Act, is the primary law protecting whistleblowers in the Philippines..."
+          }
+        ]
+      },
+      {
+        "title": "Red Flags in Government Procurement: How to Spot and Report Anomalies",
+        "slug": "government-procurement-red-flags",
+        "excerpt": "From overpriced contracts to rigged bidding, procurement fraud is rampant in many local and national government units. Learn how to identify irregularities and what legal remedies are available to citizens.",
+        "status": "published",
+        "type": "post",
+        "author_name": "Atty. Levi Baligod",
+        "tag_css": "bg-green-100 text-green-700",
+        "read_time": "5 min read",
+        "meta": {
+          "meta_title": "Red Flags in Government Procurement: How to Spot and Report Anomalies",
+          "meta_description": "Learn how to identify irregularities in government procurement and what legal remedies are available to citizens.",
+          "category_name": "Procurement Law"
+        },
+        "content": [
+          {
+            "type": "paragraph",
+            "content": "Government procurement irregularities range from overpriced contracts to rigged bidding processes..."
+          }
+        ]
+      },
+      {
+        "title": "How to File a Complaint Before the Ombudsman: A Step-by-Step Guide",
+        "slug": "how-to-file-ombudsman-complaint",
+        "excerpt": "The Office of the Ombudsman is the primary body for complaints against government officials. This practical guide walks you through the process, required documents, and what to expect.",
+        "status": "published",
+        "type": "post",
+        "author_name": "Atty. Levi Baligod",
+        "tag_css": "bg-purple-100 text-purple-700",
+        "read_time": "6 min read",
+        "meta": {
+          "meta_title": "How to File a Complaint Before the Ombudsman: A Step-by-Step Guide",
+          "meta_description": "A practical guide walking you through the process of filing a complaint before the Office of the Ombudsman.",
+          "category_name": "Public Accountability"
+        },
+        "content": [
+          {
+            "type": "paragraph",
+            "content": "The Office of the Ombudsman is constitutionally mandated to act on complaints against public officials..."
+          }
+        ]
+      },
+      {
+        "title": "Understanding the Sandiganbayan: The Philippines' Anti-Graft Court",
+        "slug": "sandiganbayan-philippines-anti-graft-court",
+        "excerpt": "Most Filipinos have heard of the Sandiganbayan but few understand how it works, who it has jurisdiction over, and what the process looks like from filing to verdict.",
+        "status": "published",
+        "type": "post",
+        "author_name": "Atty. Levi Baligod",
+        "tag_css": "bg-teal-100 text-teal-700",
+        "read_time": "5 min read",
+        "meta": {
+          "meta_title": "Understanding the Sandiganbayan: The Philippines' Anti-Graft Court",
+          "meta_description": "A comprehensive guide to the Sandiganbayan, the Philippines' special anti-graft court.",
+          "category_name": "Political Law"
+        },
+        "content": [
+          {
+            "type": "paragraph",
+            "content": "The Sandiganbayan, established under Presidential Decree No. 1606, is a special collegiate court in the Philippines..."
+          }
+        ]
+      }
+    ],
+    "settings": [
+      { "key": "siteName",        "value": "Baligod Law Office" },
+      { "key": "siteTagline",     "value": "Anti-Corruption Lawyer & Public Interest Advocate" },
+      { "key": "contactEmail",    "value": "levi@baligodlaw.ph" },
+      { "key": "contactPhone",    "value": "+63 (2) 9XX-XXXX" },
+      { "key": "address",         "value": "Quezon City, Metro Manila, Philippines" },
+      { "key": "metaTitle",       "value": "Atty. Levito 'Levi' Baligod | Anti-Corruption Lawyer Philippines" },
+      { "key": "metaDescription", "value": "Atty. Levito 'Levi' Baligod is a Filipino anti-corruption lawyer known for representing PDAF scam whistleblowers." },
+      { "key": "siteTheme",       "value": {
+          "primaryColor": "#b45309",
+          "accentColor":  "#d97706",
+          "bgDark":       "#020617",
+          "fontFamily":   "geist",
+          "borderRadius": "lg",
+          "logoUrl":      ""
+        }
+      }
+    ]
+  }
+}

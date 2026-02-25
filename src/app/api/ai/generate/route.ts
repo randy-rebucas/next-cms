@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/db";
-import { checkPin } from "@/lib/api";
+import connectDB from "@/lib/mongoose";
+import { Setting } from "@/models/Setting";
+import { checkPin } from "@/core/auth";
 
-function getSetting(key: string): string {
-  const row = db.prepare("SELECT value FROM settings WHERE key=?").get(key) as { value: string } | undefined;
+async function getSetting(key: string): Promise<string> {
+  await connectDB();
+  const row = await Setting.findOne({ key }).lean() as { value?: string } | null;
   return row?.value ?? "";
 }
 
 export async function POST(req: NextRequest) {
-  const denied = checkPin(req);
+  const denied = await checkPin(req);
   if (denied) return denied;
 
-  const apiKey = getSetting("openaiApiKey") || process.env.OPENAI_API_KEY || "";
+  const apiKey = (await getSetting("openaiApiKey")) || process.env.OPENAI_API_KEY || "";
   if (!apiKey) {
     return NextResponse.json(
       { error: "No OpenAI API key configured. Add it in Admin → Settings → OpenAI API Key." },
@@ -27,40 +29,33 @@ export async function POST(req: NextRequest) {
     faq_answer: `You are a Filipino anti-corruption lawyer. Write a clear, helpful answer to a legal FAQ. Use plain text, no HTML.`,
   };
 
-  const userContent =
-    type === "excerpt"
-      ? `Post title: "${title}". Write a compelling excerpt.`
-      : type === "faq_answer"
-      ? `FAQ question: "${prompt || title}". Write a clear answer based on Philippine law.`
-      : `Write a full blog post titled: "${title}". ${prompt ? `Additional context: ${prompt}` : ""}`;
+  const systemPrompt = systemPrompts[type as string] || systemPrompts.post;
 
-  try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompts[type] ?? systemPrompts.post },
-          { role: "user", content: userContent },
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,
-      }),
-    });
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: prompt || `Write about: ${title}` },
+      ],
+      max_tokens: 2000,
+      temperature: 0.7,
+    }),
+  });
 
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({})) as { error?: { message?: string } };
-      return NextResponse.json(
-        { error: errBody?.error?.message ?? `OpenAI error ${res.status}` },
-        { status: 502 }
-      );
-    }
-
-    const data = await res.json() as { choices: { message: { content: string } }[] };
-    const content = data.choices?.[0]?.message?.content ?? "";
-    return NextResponse.json({ content });
-  } catch (e) {
-    return NextResponse.json({ error: String(e) }, { status: 500 });
+  if (!response.ok) {
+    const errBody = await response.json().catch(() => ({}));
+    return NextResponse.json(
+      { error: (errBody as { error?: { message?: string } }).error?.message || "OpenAI API error" },
+      { status: response.status }
+    );
   }
+
+  const data = await response.json() as { choices: { message: { content: string } }[] };
+  return NextResponse.json({ content: data.choices[0].message.content });
 }

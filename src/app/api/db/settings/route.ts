@@ -1,12 +1,14 @@
 import { NextRequest } from "next/server";
-import db from "@/lib/db";
-import { checkPin, ok } from "@/lib/api";
+import connectDB from "@/lib/mongoose";
+import { Setting } from "@/models/Setting";
+import { checkPin, ok } from "@/core/auth";
 
-/** Returns all settings as a flat key→value object — requires PIN to keep secrets safe */
 export async function GET(req: NextRequest) {
-  const denied = checkPin(req);
+  const denied = await checkPin(req);
   if (denied) return denied;
-  const rows = db.prepare("SELECT key, value FROM settings").all() as { key: string; value: string }[];
+
+  await connectDB();
+  const rows = await Setting.find().lean() as { key: string; value: string }[];
   const result: Record<string, unknown> = {};
   for (const { key, value } of rows) {
     try { result[key] = JSON.parse(value); } catch { result[key] = value; }
@@ -14,17 +16,20 @@ export async function GET(req: NextRequest) {
   return ok(result);
 }
 
-/** Upserts key-value pairs from the request body */
 export async function PUT(req: NextRequest) {
-  const denied = checkPin(req);
+  const denied = await checkPin(req);
   if (denied) return denied;
+
   const body: Record<string, unknown> = await req.json();
-  const stmt = db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
-  const ins = db.transaction((obj: Record<string, unknown>) => {
-    for (const [k, v] of Object.entries(obj)) {
-      stmt.run(k, typeof v === "string" ? v : JSON.stringify(v));
-    }
-  });
-  ins(body);
+  await connectDB();
+
+  const ops = Object.entries(body).map(([k, v]) =>
+    Setting.findOneAndUpdate(
+      { key: k },
+      { key: k, value: typeof v === "string" ? v : JSON.stringify(v) },
+      { upsert: true, new: true }
+    )
+  );
+  await Promise.all(ops);
   return ok({ saved: true });
 }

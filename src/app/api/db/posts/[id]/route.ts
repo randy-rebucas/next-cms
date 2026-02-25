@@ -1,34 +1,61 @@
 import { NextRequest } from "next/server";
-import db from "@/lib/db";
-import { checkPin, ok, err } from "@/lib/api";
+import connectDB from "@/lib/mongoose";
+import { Post } from "@/models/Post";
+import { checkPin, ok, err } from "@/core/auth";
+import { triggerHook } from "@/core/plugins/hooks";
+import type { PostPayload } from "@/core/plugins/hooks";
 
-type Ctx = { params: Promise<{ id: string }> };
-
-export async function GET(_req: NextRequest, { params }: Ctx) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
-  const row = db.prepare("SELECT * FROM posts WHERE id = ? OR slug = ?").get(id, id);
-  if (!row) return err("Not found", 404);
-  return ok(row);
+  const denied = await checkPin(req);
+  await connectDB();
+
+  const post = await Post.findById(id).lean();
+  if (!post) return err("Not found", 404);
+
+  const serialized = post as Record<string, unknown>;
+  if (!denied && serialized.status !== "published") {
+    const token = req.nextUrl.searchParams.get("preview");
+    if (token !== serialized.preview_token) return err("Not found", 404);
+  }
+  return ok(serialized);
 }
 
-export async function PUT(req: NextRequest, { params }: Ctx) {
-  const denied = checkPin(req);
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const denied = await checkPin(req);
   if (denied) return denied;
   const { id } = await params;
-  const body = await req.json();
-  const fields = ["title", "content", "excerpt", "status", "category", "author", "read_time", "tag_css", "slug"] as const;
-  const sets = fields.filter((f) => f in body).map((f) => `${f} = ?`).join(", ");
-  const vals = fields.filter((f) => f in body).map((f) => body[f]);
-  if (!sets) return err("Nothing to update");
-  db.prepare(`UPDATE posts SET ${sets}, updated_at = datetime('now') WHERE id = ?`).run(...vals, id);
-  const row = db.prepare("SELECT * FROM posts WHERE id = ?").get(id);
-  return ok(row);
+
+  const rawBody = await req.json();
+  const body = await triggerHook("beforeSavePost", rawBody as PostPayload);
+  await connectDB();
+
+  try {
+    const doc = await Post.findByIdAndUpdate(id, body, { new: true }).lean();
+    if (!doc) return err("Not found", 404);
+    await triggerHook("afterSavePost", doc as PostPayload);
+    return ok(doc);
+  } catch (e) {
+    return err(String(e));
+  }
 }
 
-export async function DELETE(req: NextRequest, { params }: Ctx) {
-  const denied = checkPin(req);
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const denied = await checkPin(req);
   if (denied) return denied;
   const { id } = await params;
-  db.prepare("DELETE FROM posts WHERE id = ?").run(id);
+
+  await connectDB();
+  const doc = await Post.findByIdAndDelete(id).lean();
+  if (!doc) return err("Not found", 404);
   return ok({ deleted: true });
 }

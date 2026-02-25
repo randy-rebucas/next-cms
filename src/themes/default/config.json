@@ -1,0 +1,8 @@
+{
+  "id": "default",
+  "name": "Baligod Default",
+  "version": "1.0.0",
+  "description": "The original dark law-firm theme for Atty. Levi Baligod.",
+  "author": "Baligod Law Office",
+  "templates": ["home", "post", "page", "archive"]
+}

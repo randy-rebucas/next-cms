@@ -1,50 +1,37 @@
 import { NextRequest } from "next/server";
-import path from "path";
-import fs from "fs";
-import db from "@/lib/db";
-import { checkPin, ok, err } from "@/lib/api";
+import connectDB from "@/lib/mongoose";
+import { Media } from "@/models/Media";
+import { checkPin, ok, err } from "@/core/auth";
 
-interface MediaRow {
-  id: number;
-  filename: string;
-  url: string;
-  alt: string;
-}
-
-interface Params { id: string }
-
-export async function GET(req: NextRequest, { params }: { params: Promise<Params> }) {
-  const denied = checkPin(req);
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const denied = await checkPin(req);
   if (denied) return denied;
   const { id } = await params;
-  const row = db.prepare("SELECT * FROM media WHERE id = ?").get(id);
-  if (!row) return err("Not found", 404);
-  return ok(row);
-}
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<Params> }) {
-  const denied = checkPin(req);
-  if (denied) return denied;
-  const { id } = await params;
-  const { alt } = await req.json() as { alt: string };
-  db.prepare("UPDATE media SET alt = ? WHERE id = ?").run(alt ?? "", id);
-  const row = db.prepare("SELECT * FROM media WHERE id = ?").get(id);
-  return ok(row);
-}
-
-export async function DELETE(req: NextRequest, { params }: { params: Promise<Params> }) {
-  const denied = checkPin(req);
-  if (denied) return denied;
-  const { id } = await params;
-  const row = db.prepare("SELECT url FROM media WHERE id = ?").get(id) as MediaRow | undefined;
-  if (!row) return err("Not found", 404);
-
-  // Delete file from disk
+  const body = await req.json();
+  await connectDB();
   try {
-    const filePath = path.join(process.cwd(), "public", row.url);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  } catch { /* file already missing */ }
+    const doc = await Media.findByIdAndUpdate(id, body, { new: true }).lean();
+    if (!doc) return err("Not found", 404);
+    return ok(doc);
+  } catch (e) {
+    return err(String(e));
+  }
+}
 
-  db.prepare("DELETE FROM media WHERE id = ?").run(id);
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const denied = await checkPin(req);
+  if (denied) return denied;
+  const { id } = await params;
+
+  await connectDB();
+  const doc = await Media.findByIdAndDelete(id).lean();
+  if (!doc) return err("Not found", 404);
   return ok({ deleted: true });
 }
