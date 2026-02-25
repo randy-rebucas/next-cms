@@ -1,0 +1,56 @@
+[
+  {
+    "id": "1",
+    "icon": "🔍",
+    "title": "Anti-Corruption & Graft",
+    "description": "Filing and prosecuting cases of graft, corruption, malversation, and plunder before the Sandiganbayan, Ombudsman, and other bodies. Holding public officials accountable for misuse of government funds.",
+    "bullets": ["PDAF / Pork Barrel Cases", "Malversation of Public Funds", "Plunder Complaints", "Ombudsman Proceedings"],
+    "color": "border-amber-500",
+    "bg": "bg-amber-50"
+  },
+  {
+    "id": "2",
+    "icon": "⚖️",
+    "title": "Criminal Defense & Prosecution",
+    "description": "Representing clients in serious criminal matters before Philippine Regional Trial Courts, the Sandiganbayan, and the Court of Appeals — both as defense counsel and as private complainant.",
+    "bullets": ["Criminal Complaints Filing", "Sandiganbayan Litigation", "Criminal Defense (RTC)", "Private Prosecution"],
+    "color": "border-red-500",
+    "bg": "bg-red-50"
+  },
+  {
+    "id": "3",
+    "icon": "🏛",
+    "title": "Public Interest Litigation",
+    "description": "Pursuing cases that serve the broader public good — whistleblower protection, government transparency, and accountability of public officials and government-owned corporations.",
+    "bullets": ["Whistleblower Representation", "Government Transparency Cases", "Public Accountability Suits", "Constitutional Petitions"],
+    "color": "border-blue-500",
+    "bg": "bg-blue-50"
+  },
+  {
+    "id": "4",
+    "icon": "🏗️",
+    "title": "Infrastructure & Procurement Law",
+    "description": "Investigating and litigating irregularities in government procurement, infrastructure contracts, and public works projects, including anomalous bidding and overpriced contracts.",
+    "bullets": ["Procurement Fraud", "Infrastructure Contract Disputes", "COA Referrals", "Bidding Irregularities"],
+    "color": "border-green-500",
+    "bg": "bg-green-50"
+  },
+  {
+    "id": "5",
+    "icon": "📜",
+    "title": "Civil Litigation",
+    "description": "Handling civil disputes involving contracts, property, damages, and other private legal matters before Philippine trial courts and appellate bodies.",
+    "bullets": ["Contract Disputes", "Property & Real Estate", "Damages Claims", "Court of Appeals Appeals"],
+    "color": "border-purple-500",
+    "bg": "bg-purple-50"
+  },
+  {
+    "id": "6",
+    "icon": "📰",
+    "title": "Political & Electoral Law",
+    "description": "Advising on matters of electoral law, political party regulations, campaign finance, and election-related complaints before COMELEC and other electoral bodies.",
+    "bullets": ["COMELEC Proceedings", "Election Protests", "Campaign Finance", "Political Accountability"],
+    "color": "border-teal-500",
+    "bg": "bg-teal-50"
+  }
+]

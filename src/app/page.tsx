@@ -1,65 +1,111 @@
-import Image from "next/image";
+import db from "@/lib/db";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import About from "@/components/About";
+import PracticeAreas from "@/components/PracticeAreas";
+import Experience from "@/components/Experience";
+import ToolsSection from "@/components/ToolsSection";
+import Testimonials from "@/components/Testimonials";
+import FAQ from "@/components/FAQ";
+import Blog from "@/components/Blog";
+import Contact from "@/components/Contact";
+import Footer from "@/components/Footer";
+import type { SiteData, PracticeArea, ExperienceEvent, Testimonial, BlogPost, FAQItem } from "@/types/content";
+
+function tryParse<T>(val: string, fallback: T): T {
+  try { return JSON.parse(val) as T; } catch { return fallback; }
+}
 
 export default function Home() {
+  // ── Site settings ─────────────────────────────────────────────────────────
+  const rawSettings = db.prepare("SELECT key, value FROM settings").all() as { key: string; value: string }[];
+  const s: Record<string, unknown> = {};
+  for (const { key, value } of rawSettings) {
+    s[key] = tryParse<unknown>(value, value);
+  }
+  const site = s as unknown as SiteData;
+
+  // ── Practice Areas ────────────────────────────────────────────────────────
+  type DbPA = { id: number; icon: string; title: string; description: string; bullets: string; color: string; bg: string };
+  const areas: PracticeArea[] = (
+    db.prepare("SELECT * FROM practice_areas WHERE status = 'published' ORDER BY sort_order").all() as DbPA[]
+  ).map((r) => ({
+    id: String(r.id),
+    icon: r.icon,
+    title: r.title,
+    description: r.description,
+    bullets: tryParse<string[]>(r.bullets, []),
+    color: r.color,
+    bg: r.bg,
+  }));
+
+  // ── Experience ────────────────────────────────────────────────────────────
+  type DbEE = { id: number; year: string; title: string; subtitle: string; description: string };
+  const events: ExperienceEvent[] = (
+    db.prepare("SELECT * FROM experience_events ORDER BY sort_order").all() as DbEE[]
+  ).map((r) => ({
+    id: String(r.id),
+    year: r.year,
+    title: r.title,
+    subtitle: r.subtitle,
+    description: r.description,
+  }));
+
+  // ── Testimonials ──────────────────────────────────────────────────────────
+  type DbT = { id: number; name: string; case_type: string; rating: number; text: string; initials: string; color: string };
+  const reviews: Testimonial[] = (
+    db.prepare("SELECT * FROM testimonials WHERE status = 'published'").all() as DbT[]
+  ).map((r) => ({
+    id: String(r.id),
+    name: r.name,
+    case: r.case_type,
+    rating: r.rating,
+    text: r.text,
+    initials: r.initials,
+    color: r.color,
+  }));
+
+  // ── Blog Posts ────────────────────────────────────────────────────────────
+  type DbPost = { id: number; slug: string; category: string; title: string; excerpt: string; author: string; read_time: string; tag_css: string; created_at: string };
+  const posts: BlogPost[] = (
+    db.prepare("SELECT id, slug, category, title, excerpt, author, read_time, tag_css, created_at FROM posts WHERE status = 'published' ORDER BY created_at DESC LIMIT 6").all() as DbPost[]
+  ).map((r) => ({
+    id: String(r.id),
+    slug: r.slug,
+    category: r.category,
+    title: r.title,
+    excerpt: r.excerpt,
+    author: r.author,
+    date: new Date(r.created_at).toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" }),
+    readTime: r.read_time,
+    tag: r.tag_css,
+  }));
+
+  // ── FAQs ──────────────────────────────────────────────────────────────────
+  type DbFaq = { id: number; question: string; answer: string };
+  const faqs: FAQItem[] = (
+    db.prepare("SELECT * FROM faqs WHERE status = 'published' ORDER BY sort_order").all() as DbFaq[]
+  ).map((r) => ({
+    id: String(r.id),
+    q: r.question,
+    a: r.answer,
+  }));
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <Navbar />
+      <main className="pt-16">
+        <Hero site={site} />
+        <About site={site} />
+        <PracticeAreas areas={areas} />
+        <Experience events={events} />
+        <ToolsSection />
+        <Testimonials reviews={reviews} />
+        <FAQ faqs={faqs} />
+        <Blog posts={posts} />
+        <Contact site={site} />
       </main>
-    </div>
+      <Footer site={site} />
+    </>
   );
 }
