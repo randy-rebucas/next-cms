@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Save, Eye, EyeOff, Sparkles, ArrowLeft, Loader2 } from "lucide-react";
+import { Save, Eye, EyeOff, Sparkles, ArrowLeft, Loader2, Link2, X } from "lucide-react";
 import Link from "next/link";
+import { useAdminAuth } from "@/app/admin/layout";
 
 const TipTapEditor = dynamic(() => import("@/components/admin/TipTapEditor"), { ssr: false });
 
@@ -19,7 +20,14 @@ interface PostData {
   author: string;
   read_time: string;
   tag_css: string;
+  featured_image: string;
+  meta_title: string;
+  meta_description: string;
+  og_image: string;
 }
+
+interface Taxonomy { id: number; name: string; slug: string; }
+
 
 const DEFAULT_TAG_OPTIONS = [
   { label: "Amber", value: "bg-amber-100 text-amber-700" },
@@ -32,7 +40,7 @@ const DEFAULT_TAG_OPTIONS = [
 
 export default function PostEditor({ initial }: { initial?: Partial<PostData> }) {
   const router = useRouter();
-  const pin = typeof window !== "undefined" ? sessionStorage.getItem("adminPin") ?? "" : "";
+  const { pin } = useAdminAuth();
 
   const [data, setData] = useState<PostData>({
     title: initial?.title ?? "",
@@ -44,12 +52,27 @@ export default function PostEditor({ initial }: { initial?: Partial<PostData> })
     author: initial?.author ?? "Atty. Levi Baligod",
     read_time: initial?.read_time ?? "5 min read",
     tag_css: initial?.tag_css ?? "bg-slate-100 text-slate-600",
+    featured_image: initial?.featured_image ?? "",
+    meta_title: initial?.meta_title ?? "",
+    meta_description: initial?.meta_description ?? "",
+    og_image: initial?.og_image ?? "",
   });
 
   const [saving, setSaving] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
   const [toast, setToast] = useState("");
+  const [seoOpen, setSeoOpen] = useState(false);
+  const [generatingPreview, setGeneratingPreview] = useState(false);
+  const [categories, setCategories] = useState<Taxonomy[]>([]);
+  const [allTags, setAllTags] = useState<Taxonomy[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+
+
+  useEffect(() => {
+    fetch("/api/db/categories").then((r) => r.json()).then(setCategories).catch(() => {});
+    fetch("/api/db/tags").then((r) => r.json()).then(setAllTags).catch(() => {});
+  }, []);
 
   const set = <K extends keyof PostData>(key: K, val: PostData[K]) =>
     setData((d) => ({ ...d, [key]: val }));
@@ -57,9 +80,30 @@ export default function PostEditor({ initial }: { initial?: Partial<PostData> })
   const autoSlug = (t: string) =>
     t.toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").slice(0, 80);
 
+  const toggleTag = (id: number) =>
+    setSelectedTagIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+
+  const generatePreview = async () => {
+    if (!initial?.id) { setToast("Save the post first"); return; }
+    setGeneratingPreview(true);
+    const res = await fetch(`/api/db/posts/${initial.id}/preview-token`, {
+      method: "POST",
+      headers: { "x-admin-pin": pin },
+    });
+    if (res.ok) {
+      const json = await res.json() as { url: string };
+      window.open(json.url, "_blank");
+    } else {
+      setToast("Preview failed");
+    }
+    setGeneratingPreview(false);
+  };
+
   const save = async (status?: "draft" | "published") => {
     setSaving(true);
-    const payload = { ...data, status: status ?? data.status };
+    const payload = { ...data, status: status ?? data.status, tag_ids: selectedTagIds };
     const isNew = !initial?.id;
     const url = isNew ? "/api/db/posts" : `/api/db/posts/${initial!.id}`;
     const method = isNew ? "POST" : "PUT";
@@ -120,6 +164,17 @@ export default function PostEditor({ initial }: { initial?: Partial<PostData> })
         <div className="flex items-center gap-2">
           {toast && (
             <span className="text-xs text-green-400 font-medium">{toast}</span>
+          )}
+          {initial?.id && (
+            <button
+              onClick={generatePreview}
+              disabled={generatingPreview}
+              title="Open draft preview in new tab"
+              className="flex items-center gap-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
+            >
+              {generatingPreview ? <Loader2 size={14} className="animate-spin" /> : <Link2 size={14} />}
+              Preview
+            </button>
           )}
           <button
             onClick={() => save("draft")}
@@ -196,6 +251,53 @@ export default function PostEditor({ initial }: { initial?: Partial<PostData> })
               className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500 resize-none"
             />
           </div>
+
+          {/* SEO Panel */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+            <button
+              onClick={() => setSeoOpen((v) => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-slate-300 hover:text-white"
+            >
+              SEO Settings
+              <span className="text-xs text-slate-600">{seoOpen ? "▲" : "▼"}</span>
+            </button>
+            {seoOpen && (
+              <div className="px-4 pb-4 space-y-3 border-t border-slate-800">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1">Meta Title</label>
+                  <input
+                    type="text"
+                    value={data.meta_title}
+                    onChange={(e) => set("meta_title", e.target.value)}
+                    placeholder={`${data.title} | Baligod Law Office`}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500"
+                  />
+                  <p className="text-xs text-slate-600 mt-1">{data.meta_title.length}/60 chars</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1">Meta Description</label>
+                  <textarea
+                    rows={2}
+                    value={data.meta_description}
+                    onChange={(e) => set("meta_description", e.target.value)}
+                    placeholder="Describe this post for search engines…"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 resize-none"
+                  />
+                  <p className="text-xs text-slate-600 mt-1">{data.meta_description.length}/160 chars</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1">OG Image URL</label>
+                  <input
+                    type="text"
+                    value={data.og_image}
+                    onChange={(e) => set("og_image", e.target.value)}
+                    placeholder="/uploads/2024/01/og.jpg"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Sidebar metadata */}
@@ -228,13 +330,67 @@ export default function PostEditor({ initial }: { initial?: Partial<PostData> })
 
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1">Category</label>
+              {categories.length > 0 ? (
+                <select
+                  value={data.category}
+                  onChange={(e) => set("category", e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500"
+                >
+                  <option value="">— None —</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={data.category}
+                  onChange={(e) => set("category", e.target.value)}
+                  placeholder="e.g. Anti-Corruption"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500"
+                />
+              )}
+            </div>
+
+            {allTags.length > 0 && (
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Tags</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {allTags.map((tag) => {
+                    const active = selectedTagIds.includes(tag.id);
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => toggleTag(tag.id)}
+                        className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${
+                          active
+                            ? "bg-amber-600 border-amber-500 text-white"
+                            : "bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500"
+                        }`}
+                      >
+                        {active && <X size={9} className="inline mr-0.5" />}
+                        {tag.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">Featured Image URL</label>
               <input
                 type="text"
-                value={data.category}
-                onChange={(e) => set("category", e.target.value)}
-                placeholder="e.g. Anti-Corruption"
+                value={data.featured_image}
+                onChange={(e) => set("featured_image", e.target.value)}
+                placeholder="/uploads/2024/01/banner.jpg"
                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500"
               />
+              {data.featured_image && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={data.featured_image} alt="" className="mt-2 rounded-lg w-full object-cover max-h-24 bg-slate-800" />
+              )}
             </div>
 
             <div>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FileText, Briefcase, Star, HelpCircle, Clock, PlusCircle, Settings } from "lucide-react";
+import { useAdminAuth } from "@/app/admin/layout";
 
 interface Stats {
   posts_total: number;
@@ -23,18 +24,21 @@ interface Post {
 }
 
 export default function Dashboard() {
+  const { pin } = useAdminAuth();
   const [stats, setStats] = useState<Stats | null>(null);
   const [recent, setRecent] = useState<Post[]>([]);
 
   useEffect(() => {
+    if (!pin) return;
     (async () => {
       try {
+        const h = { "x-admin-pin": pin };
         const [posts, pa, tl, fq, ex] = await Promise.all([
-          fetch("/api/db/posts").then((r) => r.json()),
-          fetch("/api/db/practice-areas").then((r) => r.json()),
-          fetch("/api/db/testimonials").then((r) => r.json()),
-          fetch("/api/db/faq").then((r) => r.json()),
-          fetch("/api/db/experience").then((r) => r.json()),
+          fetch("/api/db/posts", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/practice-areas", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/testimonials", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/faq", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/experience", { headers: h }).then((r) => r.json()),
         ]) as [Post[], unknown[], unknown[], unknown[], unknown[]];
         setStats({
           posts_total: posts.length,
@@ -50,7 +54,7 @@ export default function Dashboard() {
         // network or parse error — leave stats as null (skeleton stays visible)
       }
     })();
-  }, []);
+  }, [pin]);
 
   const cards = stats
     ? [

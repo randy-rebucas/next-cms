@@ -23,7 +23,7 @@ export default function PostsList() {
   const pin = typeof window !== "undefined" ? sessionStorage.getItem("adminPin") ?? "" : "";
 
   const load = () =>
-    fetch(`/api/db/posts?status=${filter}`)
+    fetch(`/api/db/posts?status=${filter}`, { headers: { "x-admin-pin": pin } })
       .then((r) => r.json())
       .then(setPosts);
 

@@ -17,6 +17,12 @@ import {
   ChevronRight,
   Menu,
   X,
+  Image as ImageIcon,
+  Layout,
+  Tag,
+  FolderOpen,
+  Palette,
+  Puzzle,
 } from "lucide-react";
 
 // ── Auth Context ─────────────────────────────────────────────────────────────
@@ -27,13 +33,19 @@ export const useAdminAuth = () => useContext(AuthCtx);
 // ── Nav Items ────────────────────────────────────────────────────────────────
 
 const NAV = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/posts", label: "Posts", icon: FileText },
+  { href: "/admin/dashboard",      label: "Dashboard",      icon: LayoutDashboard },
+  { href: "/admin/posts",          label: "Posts",          icon: FileText },
+  { href: "/admin/pages",          label: "Pages",          icon: Layout },
+  { href: "/admin/media",          label: "Media",          icon: ImageIcon },
+  { href: "/admin/categories",     label: "Categories",     icon: FolderOpen },
+  { href: "/admin/tags",           label: "Tags",           icon: Tag },
   { href: "/admin/practice-areas", label: "Practice Areas", icon: Briefcase },
-  { href: "/admin/experience", label: "Experience", icon: Clock },
-  { href: "/admin/testimonials", label: "Testimonials", icon: Star },
-  { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/experience",     label: "Experience",     icon: Clock },
+  { href: "/admin/testimonials",   label: "Testimonials",   icon: Star },
+  { href: "/admin/faq",            label: "FAQ",            icon: HelpCircle },
+  { href: "/admin/theme",          label: "Theme",          icon: Palette },
+  { href: "/admin/plugins",        label: "Plugins",        icon: Puzzle },
+  { href: "/admin/settings",       label: "Settings",       icon: Settings },
 ];
 
 // ── Login Screen ─────────────────────────────────────────────────────────────

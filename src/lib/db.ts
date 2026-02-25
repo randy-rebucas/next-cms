@@ -76,9 +76,68 @@ CREATE TABLE IF NOT EXISTS settings (
   key         TEXT    PRIMARY KEY,
   value       TEXT    NOT NULL DEFAULT ''
 );
+
+CREATE TABLE IF NOT EXISTS media (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  filename      TEXT    NOT NULL,
+  original_name TEXT    NOT NULL DEFAULT '',
+  mime_type     TEXT    DEFAULT '',
+  size_bytes    INTEGER DEFAULT 0,
+  width         INTEGER DEFAULT 0,
+  height        INTEGER DEFAULT 0,
+  alt           TEXT    DEFAULT '',
+  url           TEXT    NOT NULL DEFAULT '',
+  created_at    TEXT    DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS categories (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  name        TEXT    NOT NULL DEFAULT '',
+  slug        TEXT    UNIQUE NOT NULL DEFAULT '',
+  description TEXT    DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS tags (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  name        TEXT    NOT NULL DEFAULT '',
+  slug        TEXT    UNIQUE NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS post_tags (
+  post_id     INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  tag_id      INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  PRIMARY KEY (post_id, tag_id)
+);
+
+CREATE TABLE IF NOT EXISTS pages (
+  id               INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug             TEXT    UNIQUE NOT NULL,
+  title            TEXT    NOT NULL DEFAULT '',
+  content          TEXT    DEFAULT '',
+  excerpt          TEXT    DEFAULT '',
+  status           TEXT    DEFAULT 'draft',
+  author           TEXT    DEFAULT 'Atty. Levi Baligod',
+  featured_image   TEXT    DEFAULT '',
+  meta_title       TEXT    DEFAULT '',
+  meta_description TEXT    DEFAULT '',
+  og_image         TEXT    DEFAULT '',
+  created_at       TEXT    DEFAULT (datetime('now')),
+  updated_at       TEXT    DEFAULT (datetime('now'))
+);
 `);
 
-// ── Seed from JSON files if tables are empty ───────────────────────────────
+// ── Safe column migrations (no-op if column already exists) ─────────────────
+function addColumn(table: string, col: string, def: string) {
+  try { db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`); } catch { /* already exists */ }
+}
+addColumn("posts", "featured_image",   "TEXT DEFAULT ''");
+addColumn("posts", "meta_title",       "TEXT DEFAULT ''");
+addColumn("posts", "meta_description", "TEXT DEFAULT ''");
+addColumn("posts", "og_image",         "TEXT DEFAULT ''");
+addColumn("posts", "preview_token",    "TEXT DEFAULT NULL");
+addColumn("posts", "category_id",      "INTEGER DEFAULT NULL");
+
+// ── Seed from JSON files if tables are empty ──────────────────────────────
 function seeded(table: string): boolean {
   const row = db.prepare(`SELECT COUNT(*) as cnt FROM ${table}`).get() as { cnt: number };
   return row.cnt > 0;

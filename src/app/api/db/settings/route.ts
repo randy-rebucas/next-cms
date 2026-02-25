@@ -2,16 +2,14 @@ import { NextRequest } from "next/server";
 import db from "@/lib/db";
 import { checkPin, ok } from "@/lib/api";
 
-/** Returns all settings as a flat key→value object */
-export async function GET() {
+/** Returns all settings as a flat key→value object — requires PIN to keep secrets safe */
+export async function GET(req: NextRequest) {
+  const denied = checkPin(req);
+  if (denied) return denied;
   const rows = db.prepare("SELECT key, value FROM settings").all() as { key: string; value: string }[];
   const result: Record<string, unknown> = {};
   for (const { key, value } of rows) {
-    try {
-      result[key] = JSON.parse(value);
-    } catch {
-      result[key] = value;
-    }
+    try { result[key] = JSON.parse(value); } catch { result[key] = value; }
   }
   return ok(result);
 }

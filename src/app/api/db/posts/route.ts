@@ -3,14 +3,21 @@ import db from "@/lib/db";
 import { checkPin, ok, err } from "@/lib/api";
 
 export async function GET(req: NextRequest) {
+  const isAdmin = !checkPin(req); // null = authenticated
   const { searchParams } = new URL(req.url);
-  const status = searchParams.get("status"); // all | draft | published
-  let query = "SELECT * FROM posts";
+  const status = searchParams.get("status");
+
+  let query = "SELECT * FROM posts WHERE 1=1";
   const params: string[] = [];
-  if (status && status !== "all") {
-    query += " WHERE status = ?";
+
+  // Unauthenticated callers only see published posts
+  if (!isAdmin) {
+    query += " AND status = 'published'";
+  } else if (status && status !== "all") {
+    query += " AND status = ?";
     params.push(status);
   }
+
   query += " ORDER BY created_at DESC";
   const rows = db.prepare(query).all(...params);
   return ok(rows);

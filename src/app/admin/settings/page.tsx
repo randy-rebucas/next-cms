@@ -63,11 +63,12 @@ export default function SettingsAdmin() {
   const [activeSection, setActiveSection] = useState(SECTIONS[0].title);
 
   useEffect(() => {
-    fetch("/api/db/settings")
+    if (!pin) return;
+    fetch("/api/db/settings", { headers: { "x-admin-pin": pin } })
       .then((r) => r.json())
       .then((data: Settings) => setSettings(data))
       .catch(() => {});
-  }, []);
+  }, [pin]);
 
   const set = (key: string, val: string) => setSettings((s) => ({ ...s, [key]: val }));
 

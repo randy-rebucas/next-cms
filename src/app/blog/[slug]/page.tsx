@@ -18,27 +18,51 @@ interface Post {
   tag_css: string;
   created_at: string;
   updated_at: string;
+  featured_image: string;
+  meta_title: string;
+  meta_description: string;
+  og_image: string;
+  preview_token: string | null;
 }
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }
 
-export async function generateMetadata({ params }: Props) {
+function getPost(slug: string, token?: string): Post | undefined {
+  if (token) {
+    return db
+      .prepare("SELECT * FROM posts WHERE slug = ? AND (status = 'published' OR preview_token = ?)")
+      .get(slug, token) as Post | undefined;
+  }
+  return db
+    .prepare("SELECT * FROM posts WHERE slug = ? AND status = 'published'")
+    .get(slug) as Post | undefined;
+}
+
+export async function generateMetadata({ params, searchParams }: Props) {
   const { slug } = await params;
-  const post = db.prepare("SELECT title, excerpt FROM posts WHERE slug = ? AND status = 'published'").get(slug) as Pick<Post, "title" | "excerpt"> | undefined;
+  const { preview } = await searchParams;
+  const post = getPost(slug, preview);
   if (!post) return { title: "Post Not Found" };
+
+  const siteTitle = "Baligod Law Office";
   return {
-    title: `${post.title} | Baligod Law Office`,
-    description: post.excerpt,
+    title: post.meta_title || `${post.title} | ${siteTitle}`,
+    description: post.meta_description || post.excerpt,
+    openGraph: {
+      title: post.meta_title || post.title,
+      description: post.meta_description || post.excerpt,
+      images: post.og_image ? [{ url: post.og_image }] : [],
+    },
   };
 }
 
-export default async function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const post = db
-    .prepare("SELECT * FROM posts WHERE slug = ? AND status = 'published'")
-    .get(slug) as Post | undefined;
+  const { preview } = await searchParams;
+  const post = getPost(slug, preview);
 
   if (!post) notFound();
 
@@ -53,6 +77,13 @@ export default async function BlogPostPage({ params }: Props) {
       <Navbar />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-16 pt-28">
+        {/* Draft preview banner */}
+        {preview && post.status === "draft" && (
+          <div className="mb-6 bg-amber-900/40 border border-amber-500/40 rounded-xl px-4 py-3 text-sm text-amber-300 flex items-center gap-2">
+            <span className="font-semibold">Preview mode</span> — this post is not published yet.
+          </div>
+        )}
+
         {/* Back link */}
         <Link
           href="/#blog"
@@ -93,6 +124,16 @@ export default async function BlogPostPage({ params }: Props) {
             </span>
           )}
         </div>
+
+        {/* Featured image */}
+        {post.featured_image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={post.featured_image}
+            alt={post.title}
+            className="w-full rounded-2xl object-cover max-h-80 mb-8 bg-slate-800"
+          />
+        )}
 
         {/* Content */}
         <div

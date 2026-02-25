@@ -6,6 +6,7 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
+import Image from "@tiptap/extension-image";
 import {
   Bold,
   Italic,
@@ -22,6 +23,7 @@ import {
   Undo,
   Redo,
   Minus,
+  Image as ImageIcon,
 } from "lucide-react";
 
 interface Props {
@@ -37,6 +39,7 @@ export default function TipTapEditor({ content, onChange, placeholder = "Start w
       Underline,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Link.configure({ openOnClick: false }),
+      Image.configure({ allowBase64: false }),
       Placeholder.configure({ placeholder }),
     ],
     content,
@@ -89,6 +92,11 @@ export default function TipTapEditor({ content, onChange, placeholder = "Start w
     else editor.chain().focus().setLink({ href: url }).run();
   };
 
+  const addImage = () => {
+    const url = window.prompt("Image URL:");
+    if (url) editor.chain().focus().setImage({ src: url }).run();
+  };
+
   return (
     <div className="border border-slate-600 rounded-xl overflow-hidden bg-slate-800 focus-within:border-amber-500 transition-colors">
       {/* Toolbar */}
@@ -110,6 +118,7 @@ export default function TipTapEditor({ content, onChange, placeholder = "Start w
         {iconBtn(editor.isActive({ textAlign: "right" }), AlignRight, "Align Right", () => editor.chain().focus().setTextAlign("right").run())}
         <span className="w-px h-4 bg-slate-700 mx-1" />
         {iconBtn(editor.isActive("link"), LinkIcon, "Link", addLink)}
+        {iconBtn(false, ImageIcon, "Image", addImage)}
         <span className="w-px h-4 bg-slate-700 mx-1" />
         {iconBtn(!editor.can().undo(), Undo, "Undo", () => editor.chain().focus().undo().run())}
         {iconBtn(!editor.can().redo(), Redo, "Redo", () => editor.chain().focus().redo().run())}

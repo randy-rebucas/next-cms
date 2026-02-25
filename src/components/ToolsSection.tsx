@@ -7,16 +7,34 @@ import DocumentChecklist from "./DocumentChecklist";
 import ConsultationBooking from "./ConsultationBooking";
 import CaseEvaluation from "./CaseEvaluation";
 
-const tabs = [
-  { id: "sol", label: "SOL Calculator", icon: "⏱" },
-  { id: "glossary", label: "Legal Glossary", icon: "📖" },
-  { id: "checklist", label: "Doc Checklist", icon: "✅" },
-  { id: "booking", label: "Book Consult", icon: "📅" },
+const ALL_TABS = [
+  { id: "sol",        label: "SOL Calculator",  icon: "⏱" },
+  { id: "glossary",   label: "Legal Glossary",  icon: "📖" },
+  { id: "checklist",  label: "Doc Checklist",   icon: "✅" },
+  { id: "booking",    label: "Book Consult",    icon: "📅" },
   { id: "evaluation", label: "Case Evaluation", icon: "📝" },
 ];
 
-export default function ToolsSection() {
-  const [activeTab, setActiveTab] = useState("sol");
+interface EnabledTabs {
+  sol: boolean;
+  glossary: boolean;
+  checklist: boolean;
+  booking: boolean;
+  evaluation: boolean;
+}
+
+interface Props {
+  enabledTabs?: Partial<EnabledTabs>;
+}
+
+export default function ToolsSection({ enabledTabs }: Props) {
+  const tabs = enabledTabs
+    ? ALL_TABS.filter((t) => enabledTabs[t.id as keyof EnabledTabs] !== false)
+    : ALL_TABS;
+
+  const [activeTab, setActiveTab] = useState(() => tabs[0]?.id ?? "sol");
+
+  if (tabs.length === 0) return null;
 
   return (
     <section id="tools" className="bg-slate-50 py-24">

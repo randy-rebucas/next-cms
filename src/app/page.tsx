@@ -11,6 +11,7 @@ import Blog from "@/components/Blog";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import type { SiteData, PracticeArea, ExperienceEvent, Testimonial, BlogPost, FAQItem } from "@/types/content";
+import { resolvePlugins } from "@/lib/plugins";
 
 function tryParse<T>(val: string, fallback: T): T {
   try { return JSON.parse(val) as T; } catch { return fallback; }
@@ -24,6 +25,7 @@ export default function Home() {
     s[key] = tryParse<unknown>(value, value);
   }
   const site = s as unknown as SiteData;
+  const plugins = resolvePlugins(s);
 
   // ── Practice Areas ────────────────────────────────────────────────────────
   type DbPA = { id: number; icon: string; title: string; description: string; bullets: string; color: string; bg: string };
@@ -97,12 +99,22 @@ export default function Home() {
       <main className="pt-16">
         <Hero site={site} />
         <About site={site} />
-        <PracticeAreas areas={areas} />
-        <Experience events={events} />
-        <ToolsSection />
-        <Testimonials reviews={reviews} />
-        <FAQ faqs={faqs} />
-        <Blog posts={posts} />
+        {plugins.has("practice-areas") && <PracticeAreas areas={areas} />}
+        {plugins.has("experience") && <Experience events={events} />}
+        {plugins.has("tools-section") && (
+          <ToolsSection
+            enabledTabs={{
+              sol: plugins.has("sol-calculator"),
+              glossary: plugins.has("legal-glossary"),
+              checklist: plugins.has("document-checklist"),
+              booking: plugins.has("consultation-booking"),
+              evaluation: plugins.has("case-evaluation"),
+            }}
+          />
+        )}
+        {plugins.has("testimonials") && <Testimonials reviews={reviews} />}
+        {plugins.has("faq") && <FAQ faqs={faqs} />}
+        {plugins.has("blog") && <Blog posts={posts} />}
         <Contact site={site} />
       </main>
       <Footer site={site} />
