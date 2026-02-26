@@ -259,6 +259,18 @@ export default function PluginsAdmin() {
 
   return (
     <div className="max-w-4xl">
+      {/* Fixed toast */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 border text-sm px-4 py-2.5 rounded-xl shadow-xl ${
+          toast.type === "err"
+            ? "bg-slate-800 border-red-700 text-red-400"
+            : "bg-slate-800 border-slate-700 text-green-400"
+        }`}>
+          {toast.type === "err" ? <AlertCircle size={14} /> : <Check size={14} />}
+          {toast.msg}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -267,22 +279,12 @@ export default function PluginsAdmin() {
             {activeCount} of {allPlugins.length} plugins active
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {toast && (
-            <span className={`flex items-center gap-1.5 text-xs font-medium max-w-xs text-right ${
-              toast.type === "err" ? "text-red-400" : "text-green-400"
-            }`}>
-              {toast.type === "err" ? <AlertCircle size={13} /> : <Check size={13} />}
-              {toast.msg}
-            </span>
-          )}
-          <button
-            onClick={() => setUploadOpen((v) => !v)}
-            className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
-          >
-            <Upload size={14} /> Add New Plugin
-          </button>
-        </div>
+        <button
+          onClick={() => setUploadOpen((v) => !v)}
+          className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
+        >
+          <Upload size={14} /> Add New Plugin
+        </button>
       </div>
 
       {/* Upload Panel */}

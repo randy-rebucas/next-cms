@@ -119,12 +119,12 @@ export default function PostsList() {
           </p>
         ) : (
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-800 text-left text-xs text-slate-500">
-                <th className="px-5 py-3 font-semibold">Title</th>
-                <th className="px-4 py-3 font-semibold hidden sm:table-cell">Author</th>
-                <th className="px-4 py-3 font-semibold hidden md:table-cell">Date</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
+            <thead className="border-b border-slate-800 bg-slate-950/50">
+              <tr className="text-left">
+                <th className="px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">Title</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">Author</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wide hidden md:table-cell">Date</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">Status</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>

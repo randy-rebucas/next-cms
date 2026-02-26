@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useAdminAuth } from "@/app/(admin)/admin/layout";
 import {
-  Users,
   Plus,
   Trash2,
   Pencil,
@@ -149,14 +148,12 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Users size={20} className="text-amber-400" /> Users
-          </h1>
-          <p className="text-slate-500 text-sm mt-0.5">Manage admin users and their roles</p>
+          <h1 className="text-2xl font-bold text-white">Users</h1>
+          <p className="text-slate-400 text-sm mt-1">Manage admin users and their roles</p>
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
         >
           <Plus size={14} /> Add User
         </button>
