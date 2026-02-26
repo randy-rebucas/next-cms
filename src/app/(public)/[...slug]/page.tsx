@@ -17,6 +17,7 @@ import {
   loadLayout,
   loadPostTemplate,
   loadPageTemplate,
+  loadCategoryTemplate,
   loadArchiveTemplate,
 } from '@/core/themes/loader';
 import type { Types } from 'mongoose';
@@ -34,7 +35,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const { slug: segments } = await params;
   const { preview } = await searchParams;
   const route = resolveRoute(segments, preview);
-  const SITE = 'Baligod Law Office';
+  const SITE = (await import('@/models/Setting').then(m => m.Setting.findOne({ key: 'siteName' }).lean().catch(() => null)) as { value?: string } | null)?.value?.trim() || 'Law Firm';
 
   if (route.kind === 'post') {
     const post = await getPost(route.slug, route.preview);
@@ -89,7 +90,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
 export default async function CatchAllPage({ params, searchParams }: Props) {
   const { slug: segments } = await params;
-  const { preview } = await searchParams;
+  const { preview, page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10));
 
   // 1. Resolve URL → content type
   const route = resolveRoute(segments, preview);
@@ -113,24 +115,26 @@ export default async function CatchAllPage({ params, searchParams }: Props) {
   }
 
   if (route.kind === 'page') {
-    const page = await getCmsPage(route.slug);
-    if (!page) return notFound();
+    const cmsPage = await getCmsPage(route.slug);
+    if (!cmsPage) return notFound();
     const Template = await loadPageTemplate(themeName);
-    return <Layout theme={theme}><Template page={page} theme={theme} /></Layout>;
+    return <Layout theme={theme}><Template page={cmsPage} theme={theme} /></Layout>;
   }
 
   if (route.kind === 'category') {
     const category = await getCategory(route.slug);
     if (!category) return notFound();
-    const posts = await getPostsByCategory(category.slug);
-    const Template = await loadArchiveTemplate(themeName);
+    const result = await getPostsByCategory(category.slug, { page });
+    const Template = await loadCategoryTemplate(themeName);
     return (
       <Layout theme={theme}>
         <Template
-          kind='category'
-          label={category.name}
+          name={category.name}
+          slug={category.slug}
           description={category.description}
-          posts={posts}
+          posts={result.posts}
+          pagination={{ page: result.page, pages: result.pages, total: result.total }}
+          basePath={`/blog/category/${category.slug}`}
         />
       </Layout>
     );
@@ -139,14 +143,16 @@ export default async function CatchAllPage({ params, searchParams }: Props) {
   if (route.kind === 'tag') {
     const tag = await getTag(route.slug);
     if (!tag) return notFound();
-    const posts = await getPostsByTag(tag._id as Types.ObjectId);
+    const result = await getPostsByTag(tag._id as Types.ObjectId, { page });
     const Template = await loadArchiveTemplate(themeName);
     return (
       <Layout theme={theme}>
         <Template
           kind='tag'
           label={tag.name}
-          posts={posts}
+          posts={result.posts}
+          pagination={{ page: result.page, pages: result.pages, total: result.total }}
+          basePath={`/blog/tag/${tag.slug}`}
         />
       </Layout>
     );

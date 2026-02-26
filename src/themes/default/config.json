@@ -1,8 +1,14 @@
 {
   "id": "default",
-  "name": "Baligod Default",
+  "name": "Lawyer Theme",
   "version": "1.0.0",
-  "description": "The original dark law-firm theme for Atty. Levi Baligod.",
-  "author": "Baligod Law Office",
-  "templates": ["home", "post", "page", "archive"]
+  "description": "Dark professional theme for law firms. Includes hero, practice areas, experience timeline, testimonials, blog, FAQ, and contact sections.",
+  "author": "nextCMS",
+  "templates": ["home", "post", "page", "category", "archive", "search", "404"],
+  "supports": ["menus", "custom-logo", "custom-colors", "post-thumbnails", "comments"],
+  "menu-locations": {
+    "primary": "Primary Navigation",
+    "footer": "Footer Links",
+    "mobile": "Mobile Menu"
+  }
 }

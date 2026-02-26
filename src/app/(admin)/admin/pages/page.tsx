@@ -1,45 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useAdminAuth } from "@/app/(admin)/admin/layout";
-import { PlusCircle, FileText, Pencil, Trash2, Globe, Clock } from "lucide-react";
+import { PlusCircle, FileText, Pencil, Trash2, Globe, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Page {
-  id: number;
+  _id: string;
   title: string;
   slug: string;
   status: "draft" | "published";
-  author: string;
-  created_at: string;
-  updated_at: string;
+  author?: string;
+  createdAt: string;
+  updatedAt: string;
 }
+
+interface PagesResult {
+  data: Page[];
+  total: number;
+  page: number;
+  pages: number;
+}
+
+const LIMIT = 20;
 
 export default function PagesAdmin() {
   const { pin } = useAdminAuth();
-  const [pages, setPages] = useState<Page[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState<PagesResult | null>(null);
+  const [page, setPage] = useState(1);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
-  const load = () =>
-    fetch("/api/db/pages", { headers: { "x-admin-pin": pin } })
+  const load = useCallback(() => {
+    if (!pin) return;
+    const params = new URLSearchParams({ page: String(page), limit: String(LIMIT) });
+    fetch(`/api/db/pages?${params}`, { headers: { "x-admin-pin": pin } })
       .then((r) => r.json())
-      .then((data) => { setPages(Array.isArray(data) ? data : []); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then((data: unknown) => {
+        if (data && typeof data === "object" && "data" in data) {
+          setResult(data as PagesResult);
+        }
+      })
+      .catch(() => {});
+  }, [pin, page]);
 
-  useEffect(() => { if (pin) load(); }, [pin]);
+  useEffect(() => { load(); }, [load]);
 
-  const del = async (id: number, title: string) => {
+  const del = async (id: string, title: string) => {
     if (!confirm(`Delete page "${title}"?`)) return;
+    setDeleting(id);
     await fetch(`/api/db/pages/${id}`, { method: "DELETE", headers: { "x-admin-pin": pin } });
     await load();
+    setDeleting(null);
   };
+
+  const pages = result?.data ?? [];
+  const total = result?.total ?? 0;
+  const totalPages = result?.pages ?? 1;
 
   return (
     <div className="max-w-4xl">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white">Pages</h1>
-          <p className="text-slate-400 text-sm mt-1">{pages.length} pages</p>
+          <p className="text-slate-400 text-sm mt-1">{total} pages</p>
         </div>
         <Link
           href="/admin/pages/new"
@@ -49,9 +72,7 @@ export default function PagesAdmin() {
         </Link>
       </div>
 
-      {loading ? (
-        <div className="text-slate-500 text-sm">Loading…</div>
-      ) : pages.length === 0 ? (
+      {pages.length === 0 && result !== null ? (
         <div className="text-center py-20 bg-slate-900 border border-slate-800 rounded-xl">
           <FileText size={40} className="mx-auto text-slate-600 mb-3" />
           <p className="text-slate-500 text-sm">No pages yet.</p>
@@ -62,7 +83,7 @@ export default function PagesAdmin() {
       ) : (
         <div className="bg-slate-900 border border-slate-800 rounded-xl divide-y divide-slate-800">
           {pages.map((page) => (
-            <div key={page.id} className="flex items-center gap-4 px-5 py-4">
+            <div key={page._id} className="flex items-center gap-4 px-5 py-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white text-sm truncate">{page.title}</span>
@@ -79,7 +100,7 @@ export default function PagesAdmin() {
                 <div className="flex items-center gap-3 mt-1">
                   <span className="text-xs text-slate-500 font-mono">/{page.slug}</span>
                   <span className="text-xs text-slate-600 flex items-center gap-1">
-                    <Clock size={11} /> {new Date(page.updated_at).toLocaleDateString()}
+                    <Clock size={11} /> {new Date(page.updatedAt ?? page.createdAt).toLocaleDateString()}
                   </span>
                 </div>
               </div>
@@ -96,15 +117,16 @@ export default function PagesAdmin() {
                   </a>
                 )}
                 <Link
-                  href={`/admin/pages/${page.id}/edit`}
+                  href={`/admin/pages/${page._id}/edit`}
                   className="p-2 text-slate-500 hover:text-white transition-colors"
                   title="Edit"
                 >
                   <Pencil size={15} />
                 </Link>
                 <button
-                  onClick={() => del(page.id, page.title)}
-                  className="p-2 text-slate-500 hover:text-red-400 transition-colors"
+                  onClick={() => del(page._id, page.title)}
+                  disabled={deleting === page._id}
+                  className="p-2 text-slate-500 hover:text-red-400 transition-colors disabled:opacity-40"
                   title="Delete"
                 >
                   <Trash2 size={15} />
@@ -112,6 +134,30 @@ export default function PagesAdmin() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4 text-sm text-slate-400">
+          <span>
+            {((page - 1) * LIMIT) + 1}–{Math.min(page * LIMIT, total)} of {total}
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="flex items-center gap-1 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg hover:border-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={14} /> Prev
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="flex items-center gap-1 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg hover:border-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Next <ChevronRight size={14} />
+            </button>
+          </div>
         </div>
       )}
     </div>

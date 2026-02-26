@@ -4,68 +4,41 @@ import Link from "next/link";
 import { Clock, ArrowRight } from "lucide-react";
 import type { BlogPost } from "@/models/content";
 
-const defaultPosts = [
+const defaultPosts: BlogPost[] = [
   {
-    category: "Criminal Defense",
-    title: "What to Do If You're Arrested: Your 5 Most Important Rights",
-    excerpt:
-      "An arrest is a terrifying experience. Knowing your constitutional rights — especially your right to remain silent and your right to counsel — can make all the difference in the outcome of your case.",
-    author: "James R. Harrington",
-    date: "February 10, 2026",
-    readTime: "5 min read",
-    tag: "bg-blue-100 text-blue-700",
-  },
-  {
-    category: "Personal Injury",
-    title: "The 7 Mistakes That Can Destroy Your Personal Injury Claim",
-    excerpt:
-      "After an accident, the decisions you make in the first 72 hours can significantly impact your ability to recover fair compensation. Learn what to avoid to protect your claim.",
-    author: "James R. Harrington",
-    date: "January 28, 2026",
-    readTime: "7 min read",
-    tag: "bg-red-100 text-red-700",
-  },
-  {
-    category: "Family Law",
-    title: "Child Custody in New York: What Judges Actually Look For",
-    excerpt:
-      "When parents can't agree on custody, a judge decides based on the 'best interests of the child' standard. Understanding exactly what that means can help you prepare a stronger case.",
-    author: "James R. Harrington",
-    date: "January 14, 2026",
-    readTime: "6 min read",
-    tag: "bg-green-100 text-green-700",
-  },
-  {
-    category: "Business Law",
-    title: "Why Every Small Business Needs an Operating Agreement",
-    excerpt:
-      "Skipping the operating agreement when forming an LLC is one of the most costly mistakes entrepreneurs make. Here's why this document is essential and what it must include.",
-    author: "James R. Harrington",
-    date: "December 20, 2025",
-    readTime: "4 min read",
-    tag: "bg-purple-100 text-purple-700",
-  },
-  {
+    id: "sample-1",
     category: "Legal Tips",
-    title: "Understanding Contingency Fees: When You Pay Nothing Unless You Win",
+    title: "Your First Consultation: What to Bring and What to Expect",
     excerpt:
-      "Contingency fee agreements can make high-quality legal representation accessible to everyone. This guide explains exactly how they work and what questions to ask.",
-    author: "James R. Harrington",
-    date: "December 5, 2025",
+      "Preparing for your first meeting with an attorney can feel overwhelming. This guide walks you through the documents to gather, questions to ask, and what happens during a typical initial consultation.",
+    author: "The Firm",
+    date: "Sample Post",
     readTime: "4 min read",
     tag: "bg-amber-100 text-amber-700",
   },
   {
-    category: "Criminal Defense",
-    title: "Expungement in New York: Can Your Criminal Record Be Sealed?",
+    id: "sample-2",
+    category: "Client Rights",
+    title: "Understanding Attorney-Client Privilege: What It Protects",
     excerpt:
-      "New York's Clean Slate Act changes the landscape for sealing criminal records. Find out if you qualify, what offenses are eligible, and how to begin the process.",
-    author: "James R. Harrington",
-    date: "November 18, 2025",
-    readTime: "6 min read",
-    tag: "bg-teal-100 text-teal-700",
+      "Attorney-client privilege is one of the most important protections in the legal system. Learn what it covers, when it applies, and the rare exceptions that can break confidentiality.",
+    author: "The Firm",
+    date: "Sample Post",
+    readTime: "5 min read",
+    tag: "bg-blue-100 text-blue-700",
   },
-] as BlogPost[];
+  {
+    id: "sample-3",
+    category: "Legal Process",
+    title: "How Long Does a Lawsuit Take? A Realistic Timeline",
+    excerpt:
+      "One of the most common questions clients ask is how long their case will take. The honest answer depends on many factors — here is a realistic breakdown of what to expect at each stage.",
+    author: "The Firm",
+    date: "Sample Post",
+    readTime: "6 min read",
+    tag: "bg-green-100 text-green-700",
+  },
+];
 
 export default function Blog({ posts = defaultPosts }: { posts?: BlogPost[] }) {
   return (
@@ -86,16 +59,12 @@ export default function Blog({ posts = defaultPosts }: { posts?: BlogPost[] }) {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
             <article
-              key={post.title}
+              key={post.id || post.slug || post.title}
               className="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-md transition-shadow group cursor-pointer"
             >
               {/* Image placeholder */}
               <div className="h-40 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-4xl">
-              {post.category === "Anti-Corruption" ? "🔍" :
-                post.category === "Criminal Law PH" ? "⚖️" :
-                post.category === "Whistleblower Rights" ? "📣" :
-                post.category === "Procurement Law" ? "🏗️" :
-                post.category === "Public Accountability" ? "🏦" : "📜"}
+                📜
               </div>
 
               <div className="p-5">
@@ -134,9 +103,9 @@ export default function Blog({ posts = defaultPosts }: { posts?: BlogPost[] }) {
         </div>
 
         <div className="text-center mt-10">
-          <a href="/#blog" className="inline-block px-8 py-3 border-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white font-semibold rounded-xl transition-colors">
+          <Link href="/blog" className="inline-block px-8 py-3 border-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white font-semibold rounded-xl transition-colors">
             View All Articles
-          </a>
+          </Link>
         </div>
       </div>
     </section>

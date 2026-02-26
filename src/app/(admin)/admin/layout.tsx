@@ -13,10 +13,6 @@ import { SessionProvider, useSession, signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   FileText,
-  Briefcase,
-  Clock,
-  Star,
-  HelpCircle,
   Settings,
   LogOut,
   ExternalLink,
@@ -32,6 +28,9 @@ import {
   Puzzle,
   Users,
   Loader2,
+  MessageSquare,
+  Navigation,
+  Wrench,
 } from "lucide-react";
 import type { Role } from "@/core/rbac";
 
@@ -66,24 +65,17 @@ const NAV_GROUPS = [
     items: [
       { href: "/admin/posts",      label: "Posts",      icon: FileText },
       { href: "/admin/pages",      label: "Pages",      icon: Layout },
+      { href: "/admin/comments",   label: "Comments",   icon: MessageSquare },
       { href: "/admin/media",      label: "Media",      icon: ImageIcon },
       { href: "/admin/categories", label: "Categories", icon: FolderOpen },
       { href: "/admin/tags",       label: "Tags",       icon: Tag },
     ],
   },
   {
-    group: "Site Features",
-    items: [
-      { href: "/admin/practice-areas", label: "Practice Areas", icon: Briefcase },
-      { href: "/admin/experience",     label: "Experience",     icon: Clock },
-      { href: "/admin/testimonials",   label: "Testimonials",   icon: Star },
-      { href: "/admin/faq",            label: "FAQ",            icon: HelpCircle },
-    ],
-  },
-  {
     group: "Appearance",
     items: [
       { href: "/admin/theme",   label: "Theme",   icon: Palette },
+      { href: "/admin/menus",   label: "Menus",   icon: Navigation },
       { href: "/admin/plugins", label: "Plugins", icon: Puzzle },
     ],
   },
@@ -92,6 +84,7 @@ const NAV_GROUPS = [
     items: [
       { href: "/admin/users",    label: "Users",    icon: Users },
       { href: "/admin/settings", label: "Settings", icon: Settings },
+      { href: "/admin/tools",    label: "Tools",    icon: Wrench },
     ],
   },
 ];

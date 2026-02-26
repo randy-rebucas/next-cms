@@ -76,6 +76,13 @@ export type ArchivePostRow = Pick<
   "_id" | "title" | "slug" | "excerpt" | "author_name" | "read_time" | "tag_css" | "categories" | "createdAt"
 >;
 
+export interface PaginatedResult<T> {
+  posts: T[];
+  total: number;
+  page: number;
+  pages: number;
+}
+
 // ── Query helpers ────────────────────────────────────────────────────────────
 
 export async function getPost(
@@ -109,29 +116,82 @@ export async function getTag(slug: string): Promise<TagRow | null> {
 }
 
 /**
+ * All published posts — used for the /blog index listing.
+ * Supports pagination: pass { page, limit } options.
+ */
+export async function getAllPosts(
+  options: { page?: number; limit?: number } = {}
+): Promise<PaginatedResult<ArchivePostRow>> {
+  await connectDB();
+  const page  = Math.max(1, options.page  ?? 1);
+  const limit = Math.min(100, Math.max(1, options.limit ?? 12));
+  const skip  = (page - 1) * limit;
+  const filter = { status: "published" };
+
+  const [posts, total] = await Promise.all([
+    Post.find(filter)
+      .select("title slug excerpt author_name read_time tag_css categories createdAt")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean() as Promise<ArchivePostRow[]>,
+    Post.countDocuments(filter),
+  ]);
+
+  return { posts, total, page, pages: Math.ceil(total / limit) };
+}
+
+/**
  * Find posts belonging to a category (looked up by slug).
- * @param categorySlug — the slug of the category document
+ * Supports pagination: pass { page, limit } options.
  */
 export async function getPostsByCategory(
-  categorySlug: string
-): Promise<ArchivePostRow[]> {
+  categorySlug: string,
+  options: { page?: number; limit?: number } = {}
+): Promise<PaginatedResult<ArchivePostRow>> {
   await connectDB();
   const cat = await Category.findOne({ slug: categorySlug }).lean() as { _id: Types.ObjectId } | null;
-  if (!cat) return [];
-  return Post.find({ categories: cat._id, status: "published" })
-    .select("title slug excerpt author_name read_time tag_css categories createdAt")
-    .sort({ createdAt: -1 })
-    .lean() as Promise<ArchivePostRow[]>;
+  if (!cat) return { posts: [], total: 0, page: 1, pages: 0 };
+
+  const page = Math.max(1, options.page ?? 1);
+  const limit = Math.min(100, Math.max(1, options.limit ?? 12));
+  const skip = (page - 1) * limit;
+  const filter = { categories: cat._id, status: "published" };
+
+  const [posts, total] = await Promise.all([
+    Post.find(filter)
+      .select("title slug excerpt author_name read_time tag_css categories createdAt")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean() as Promise<ArchivePostRow[]>,
+    Post.countDocuments(filter),
+  ]);
+
+  return { posts, total, page, pages: Math.ceil(total / limit) };
 }
 
 export async function getPostsByTag(
-  tagId: Types.ObjectId
-): Promise<ArchivePostRow[]> {
+  tagId: Types.ObjectId,
+  options: { page?: number; limit?: number } = {}
+): Promise<PaginatedResult<ArchivePostRow>> {
   await connectDB();
-  return Post.find({ tags: tagId, status: "published" })
-    .select("title slug excerpt author_name read_time tag_css categories createdAt")
-    .sort({ createdAt: -1 })
-    .lean() as Promise<ArchivePostRow[]>;
+  const page = Math.max(1, options.page ?? 1);
+  const limit = Math.min(100, Math.max(1, options.limit ?? 12));
+  const skip = (page - 1) * limit;
+  const filter = { tags: tagId, status: "published" };
+
+  const [posts, total] = await Promise.all([
+    Post.find(filter)
+      .select("title slug excerpt author_name read_time tag_css categories createdAt")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean() as Promise<ArchivePostRow[]>,
+    Post.countDocuments(filter),
+  ]);
+
+  return { posts, total, page, pages: Math.ceil(total / limit) };
 }
 
 /** Read the active theme JSON from settings; returns raw parsed object. */

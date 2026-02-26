@@ -31,4 +31,7 @@ const PageSchema = new Schema<IPage>(
   { timestamps: true }
 );
 
+// Text index for full-text search
+PageSchema.index({ title: "text", excerpt: "text" });
+
 export const Page = models.Page ?? model<IPage>("Page", PageSchema);

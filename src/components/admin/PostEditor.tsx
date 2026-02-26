@@ -1,13 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Eye, EyeOff, Sparkles, ArrowLeft, Loader2, Link2, X } from "lucide-react";
+import { Save, Eye, EyeOff, Sparkles, ArrowLeft, Loader2, Link2, X, History } from "lucide-react";
 import Link from "next/link";
 import { useAdminAuth } from "@/app/(admin)/admin/layout";
 import BlockEditor from "@/components/admin/BlockEditor";
 
+interface Revision {
+  _id: string;
+  revisionNumber: number;
+  title: string;
+  status: string;
+  savedBy?: string;
+  createdAt: string;
+}
+
 interface PostData {
+  _id?: string;
   id?: number;
   title: string;
   slug: string;
@@ -65,12 +75,48 @@ export default function PostEditor({ initial }: { initial?: Partial<PostData> })
   const [categories, setCategories] = useState<Taxonomy[]>([]);
   const [allTags, setAllTags] = useState<Taxonomy[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [revisions, setRevisions] = useState<Revision[]>([]);
+  const [revisionsOpen, setRevisionsOpen] = useState(false);
+  const [restoring, setRestoring] = useState<string | null>(null);
+
+  const postId = initial?._id;
 
 
   useEffect(() => {
     fetch("/api/db/categories").then((r) => r.json()).then(setCategories).catch(() => {});
     fetch("/api/db/tags").then((r) => r.json()).then(setAllTags).catch(() => {});
   }, []);
+
+  const loadRevisions = useCallback(async () => {
+    if (!postId || !pin) return;
+    const res = await fetch(`/api/db/posts/${postId}/revisions`, {
+      headers: { "x-admin-pin": pin },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setRevisions(Array.isArray(data) ? data : []);
+    }
+  }, [postId, pin]);
+
+  useEffect(() => { if (postId) loadRevisions(); }, [postId, loadRevisions]);
+
+  const restoreRevision = async (revId: string) => {
+    if (!postId || !confirm("Restore this revision? The current content will be saved as a new revision first.")) return;
+    setRestoring(revId);
+    const res = await fetch(`/api/db/posts/${postId}/revisions/${revId}/restore`, {
+      method: "POST",
+      headers: { "x-admin-pin": pin },
+    });
+    if (res.ok) {
+      setToast("Revision restored");
+      setTimeout(() => setToast(""), 3000);
+      window.location.reload();
+    } else {
+      setToast("Failed to restore revision");
+      setTimeout(() => setToast(""), 3000);
+      setRestoring(null);
+    }
+  };
 
   const set = <K extends keyof PostData>(key: K, val: PostData[K]) =>
     setData((d) => ({ ...d, [key]: val }));
@@ -439,6 +485,52 @@ export default function PostEditor({ initial }: { initial?: Partial<PostData> })
             >
               View on Site →
             </a>
+          )}
+
+          {/* Revisions */}
+          {postId && (
+            <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setRevisionsOpen((v) => !v)}
+                className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-slate-300 hover:text-white"
+              >
+                <span className="flex items-center gap-2">
+                  <History size={14} />
+                  Revisions
+                  {revisions.length > 0 && (
+                    <span className="text-xs text-slate-500 font-normal">({revisions.length})</span>
+                  )}
+                </span>
+                <span className="text-xs text-slate-600">{revisionsOpen ? "▲" : "▼"}</span>
+              </button>
+              {revisionsOpen && (
+                <div className="border-t border-slate-800 max-h-64 overflow-y-auto">
+                  {revisions.length === 0 ? (
+                    <p className="text-xs text-slate-500 px-4 py-3 text-center">No revisions yet.</p>
+                  ) : (
+                    <ul className="divide-y divide-slate-800">
+                      {revisions.map((rev) => (
+                        <li key={rev._id} className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-800/50 gap-2">
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium text-slate-300">#{rev.revisionNumber} — {rev.title.slice(0, 28)}{rev.title.length > 28 ? "…" : ""}</p>
+                            <p className="text-xs text-slate-500">
+                              {new Date(rev.createdAt).toLocaleString()} · {rev.savedBy || "—"}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => restoreRevision(rev._id)}
+                            disabled={restoring === rev._id}
+                            className="shrink-0 text-xs text-amber-500 hover:text-amber-400 disabled:opacity-40 transition-colors"
+                          >
+                            {restoring === rev._id ? <Loader2 size={12} className="animate-spin" /> : "Restore"}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

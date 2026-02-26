@@ -3,10 +3,26 @@
 import { Phone, Mail, ChevronDown } from "lucide-react";
 import type { SiteData } from "@/models/content";
 
+const DEFAULT_STATS = [
+  { value: "—", label: "Years Experience" },
+  { value: "—", label: "Cases Handled" },
+  { value: "—", label: "Clients Served" },
+];
+
+const DEFAULT_BADGES = [
+  "Licensed Attorney",
+  "Bar Member",
+  "Free Consultations",
+  "Available for Inquiries",
+];
+
 export default function Hero({ site }: { site?: SiteData }) {
   const scrollTo = (id: string) => {
     document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const stats  = site?.stats?.length  ? site.stats  : DEFAULT_STATS;
+  const badges = site?.badges?.length ? site.badges : DEFAULT_BADGES;
 
   return (
     <section
@@ -33,23 +49,21 @@ export default function Hero({ site }: { site?: SiteData }) {
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-4">
-            {site?.name ?? "Atty. Levito"}{" "}
-            <span className="text-amber-500">{site?.nameHighlight ?? '"Levi" Baligod'}</span>
+            {site?.name ?? "Your Law Firm"}{" "}
+            {site?.nameHighlight && (
+              <span className="text-amber-500">{site.nameHighlight}</span>
+            )}
           </h1>
           <p className="text-xl text-slate-300 font-medium mb-2">
-            {site?.title ?? "Anti-Corruption Lawyer & Public Interest Advocate"}
+            {site?.title ?? "Experienced Legal Representation"}
           </p>
           <p className="text-slate-400 text-lg mb-8 leading-relaxed max-w-lg">
-            {site?.description ?? "Over 25 years of fighting for accountability and justice in the Philippines. Known nationally for representing PDAF scam whistleblowers and filing malversation cases against corrupt public officials."}
+            {site?.description ?? "Dedicated legal services tailored to your needs. We are committed to protecting your rights and achieving the best possible outcome for your case."}
           </p>
 
           {/* Stats */}
           <div className="flex gap-8 mb-10">
-            {(site?.stats ?? [
-              { value: "25+", label: "Years Experience" },
-              { value: "2000", label: "Bar Passer" },
-              { value: "₱10B+", label: "Public Funds Exposed" },
-            ]).map((s) => (
+            {stats.map((s) => (
               <div key={s.label}>
                 <div className="text-2xl font-bold text-amber-400">{s.value}</div>
                 <div className="text-xs text-slate-400 mt-1">{s.label}</div>
@@ -81,48 +95,50 @@ export default function Hero({ site }: { site?: SiteData }) {
               ⚖️
             </div>
             <h2 className="text-white text-center text-xl font-bold mb-1">
-              Atty. Levito &ldquo;Levi&rdquo; Baligod
+              {site?.name ?? "Attorney Name"}
             </h2>
             <p className="text-amber-400 text-center text-sm mb-6">
-              {site?.credentials ?? "UP Economics & Pol. Sci. • San Beda / UE School of Law • Bar 2000"}
+              {site?.credentials ?? "Licensed Attorney"}
             </p>
 
             <div className="space-y-3 border-t border-slate-700 pt-6">
               <a
-                href={site?.phoneHref ?? "tel:+6329XXXXXXX"}
+                href={site?.phoneHref ?? "tel:+10000000000"}
                 className="flex items-center gap-3 text-slate-300 hover:text-amber-400 transition-colors text-sm"
               >
                 <Phone size={16} className="text-amber-500 shrink-0" />
-                {site?.phone ?? "+63 (2) 9XX-XXXX"}
+                {site?.phone ?? "Phone not configured"}
               </a>
               <a
-                href={site?.emailHref ?? "mailto:levi@baligodlaw.ph"}
+                href={site?.emailHref ?? "mailto:contact@lawfirm.com"}
                 className="flex items-center gap-3 text-slate-300 hover:text-amber-400 transition-colors text-sm"
               >
                 <Mail size={16} className="text-amber-500 shrink-0" />
-                {site?.email ?? "levi@baligodlaw.ph"}
+                {site?.email ?? "Email not configured"}
               </a>
-              <div className="flex items-center gap-3 text-slate-300 text-sm">
-                <span className="text-amber-500 text-base shrink-0">📍</span>
-                Quezon City, Metro Manila, Philippines
-              </div>
-              <div className="flex items-center gap-3 text-slate-300 text-sm">
-                <span className="text-amber-500 text-base shrink-0">🕐</span>
-                Mon – Fri: 9 AM – 5 PM | By appointment on Sat
-              </div>
+              {(site?.mapAddress || site?.mapAddress2) && (
+                <div className="flex items-center gap-3 text-slate-300 text-sm">
+                  <span className="text-amber-500 text-base shrink-0">📍</span>
+                  {[site.mapAddress, site.mapAddress2].filter(Boolean).join(", ")}
+                </div>
+              )}
+              {site?.hours && (
+                <div className="flex items-center gap-3 text-slate-300 text-sm">
+                  <span className="text-amber-500 text-base shrink-0">🕐</span>
+                  {site.hours}
+                </div>
+              )}
             </div>
 
             <div className="mt-6 pt-6 border-t border-slate-700 grid grid-cols-2 gap-2">
-              {(site?.badges ?? ["PDAF Scam Counsel", "Senate Candidate 2016", "IBP Member", "Anti-Corruption Advocate"]).map(
-                (badge) => (
-                  <div
-                    key={badge}
-                    className="bg-slate-700/50 rounded px-2 py-1.5 text-xs text-slate-300 text-center"
-                  >
-                    {badge}
-                  </div>
-                )
-              )}
+              {badges.map((badge) => (
+                <div
+                  key={badge}
+                  className="bg-slate-700/50 rounded px-2 py-1.5 text-xs text-slate-300 text-center"
+                >
+                  {badge}
+                </div>
+              ))}
             </div>
           </div>
         </div>

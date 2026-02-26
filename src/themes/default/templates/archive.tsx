@@ -1,17 +1,27 @@
 import Link from "next/link";
-import { ArrowLeft, Clock, Tag, User } from "lucide-react";
+import { ArrowLeft, Clock, ChevronLeft, ChevronRight, Tag, User } from "lucide-react";
 import type { ArchivePostRow } from "@/core/content";
 
+export interface PaginationInfo {
+  page: number;
+  pages: number;
+  total: number;
+}
+
 export interface ArchiveTemplateProps {
-  kind: "category" | "tag";
-  /** Display name: category name or tag name (without #). */
+  /** "tag" for tag archives, "blog" for the /blog index listing. */
+  kind: "tag" | "blog";
+  /** Display name: tag name or archive heading. */
   label: string;
   description?: string;
   posts: ArchivePostRow[];
+  pagination?: PaginationInfo;
+  /** Base path for pagination links, e.g. /blog/category/law */
+  basePath?: string;
 }
 
 /**
- * Default theme — category / tag archive view.
+ * Default theme — category / tag / blog-index archive view.
  * Rendered inside DefaultLayout (Navbar + Footer already provided).
  */
 export default function ArchiveTemplate({
@@ -19,27 +29,38 @@ export default function ArchiveTemplate({
   label,
   description,
   posts,
+  pagination,
+  basePath = "",
 }: ArchiveTemplateProps) {
+  const showPagination = pagination && pagination.pages > 1;
+
+  const backHref  = kind === "blog" ? "/" : "/blog";
+  const backLabel = kind === "blog" ? "Back to Home" : "All Articles";
+
+  const kindLabel = kind === "tag" ? "Tag" : "Blog";
+
+  const displayTitle = kind === "tag" ? `#${label}` : label;
+
   return (
     <main className="max-w-4xl mx-auto px-4 sm:px-6 py-16 pt-28">
       <Link
-        href="/#blog"
+        href={backHref}
         className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-amber-400 transition-colors mb-8"
       >
-        <ArrowLeft size={14} /> Back to Articles
+        <ArrowLeft size={14} /> {backLabel}
       </Link>
 
       <div className="mb-10">
         <span className="text-xs font-semibold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
           {kind === "tag" ? <Tag size={11} /> : null}
-          {kind === "category" ? "Category" : "Tag"}
+          {kindLabel}
         </span>
         <h1 className="text-3xl font-bold text-white mt-1">
-          {kind === "tag" ? `#${label}` : label}
+          {displayTitle}
         </h1>
         {description && <p className="text-slate-400 mt-2 text-sm">{description}</p>}
         <p className="text-slate-500 text-xs mt-1">
-          {posts.length} article{posts.length !== 1 ? "s" : ""}
+          {pagination?.total ?? posts.length} article{(pagination?.total ?? posts.length) !== 1 ? "s" : ""}
         </p>
       </div>
 
@@ -85,6 +106,39 @@ export default function ArchiveTemplate({
               </Link>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {showPagination && (
+        <div className="flex items-center justify-between mt-12 pt-8 border-t border-slate-800">
+          <Link
+            href={pagination.page > 1 ? `${basePath}?page=${pagination.page - 1}` : "#"}
+            aria-disabled={pagination.page <= 1}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+              pagination.page <= 1
+                ? "border-slate-800 text-slate-600 pointer-events-none"
+                : "border-slate-700 text-slate-300 hover:border-amber-500 hover:text-amber-400"
+            }`}
+          >
+            <ChevronLeft size={16} /> Previous
+          </Link>
+
+          <span className="text-sm text-slate-500">
+            Page {pagination.page} of {pagination.pages}
+          </span>
+
+          <Link
+            href={pagination.page < pagination.pages ? `${basePath}?page=${pagination.page + 1}` : "#"}
+            aria-disabled={pagination.page >= pagination.pages}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+              pagination.page >= pagination.pages
+                ? "border-slate-800 text-slate-600 pointer-events-none"
+                : "border-slate-700 text-slate-300 hover:border-amber-500 hover:text-amber-400"
+            }`}
+          >
+            Next <ChevronRight size={16} />
+          </Link>
         </div>
       )}
     </main>

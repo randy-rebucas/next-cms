@@ -6,9 +6,9 @@ import type { SiteData } from "@/models/content";
 
 export default function Contact({ site }: { site?: SiteData }) {
   const contactInfo = [
-    { icon: Phone, label: "Phone", value: site?.phone ?? "+63 (2) 9XX-XXXX", href: site?.phoneHref ?? "tel:+6329XXXXXXX" },
-    { icon: Mail, label: "Email", value: site?.email ?? "levi@baligodlaw.ph", href: site?.emailHref ?? "mailto:levi@baligodlaw.ph" },
-    { icon: MapPin, label: "Office", value: `${site?.mapAddress ?? "Quezon City, Metro Manila"}\n${site?.mapAddress2 ?? "Philippines"}`, href: "#" },
+    { icon: Phone, label: "Phone", value: site?.phone ?? "Phone not configured", href: site?.phoneHref ?? "tel:+10000000000" },
+    { icon: Mail, label: "Email", value: site?.email ?? "Email not configured", href: site?.emailHref ?? "mailto:contact@lawfirm.com" },
+    { icon: MapPin, label: "Office", value: `${site?.mapAddress ?? "Office address not configured"}${site?.mapAddress2 ? "\n" + site.mapAddress2 : ""}`, href: "#" },
     { icon: Clock, label: "Hours", value: site?.hours ?? "Mon–Fri: 9 AM – 5 PM\nSat: By Appointment", href: "#" },
   ];
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
@@ -30,7 +30,7 @@ export default function Contact({ site }: { site?: SiteData }) {
             Contact Us
           </h2>
           <p className="text-slate-400 mt-6 max-w-xl mx-auto">
-            Have a legal concern or want to discuss a case? Reach out and Atty. Levi will respond within 24 hours.
+            {site?.contactDescription ?? "Have a legal concern or want to discuss a case? Reach out and we will respond within 24 hours."}
           </p>
         </div>
 
@@ -58,16 +58,24 @@ export default function Contact({ site }: { site?: SiteData }) {
             {/* Map placeholder */}
             <div className="mt-8 bg-slate-800 border border-slate-700 rounded-2xl h-52 flex flex-col items-center justify-center text-slate-500">
               <MapPin size={32} className="text-amber-500 mb-2" />
-              <p className="text-sm">Quezon City, Metro Manila</p>
-              <p className="text-sm">Philippines</p>
-              <a
-                href="https://maps.google.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 text-amber-500 hover:text-amber-400 text-xs underline"
-              >
-                Open in Google Maps →
-              </a>
+              {site?.mapAddress ? (
+                <>
+                  <p className="text-sm">{site.mapAddress}</p>
+                  {site.mapAddress2 && <p className="text-sm">{site.mapAddress2}</p>}
+                </>
+              ) : (
+                <p className="text-sm text-slate-600">Office address not configured</p>
+              )}
+              {(site?.mapAddress || site?.mapAddress2) && (
+                <a
+                  href={`https://maps.google.com/maps?q=${encodeURIComponent([site?.mapAddress, site?.mapAddress2].filter(Boolean).join(", "))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 text-amber-500 hover:text-amber-400 text-xs underline"
+                >
+                  Open in Google Maps →
+                </a>
+              )}
             </div>
           </div>
 

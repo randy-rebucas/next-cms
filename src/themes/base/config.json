@@ -1,0 +1,10 @@
+{
+  "id": "base",
+  "name": "Base Starter Theme",
+  "version": "1.0.0",
+  "description": "Minimal starter scaffold for building new themes. Copy this directory, rename it, and implement the required files. All unimplemented templates inherit from the Default theme.",
+  "author": "nextCMS",
+  "parent": "default",
+  "templates": [],
+  "supports": ["menus", "custom-logo", "custom-colors"]
+}

@@ -11,6 +11,7 @@ import {
   ImageIcon,
   Mail,
   Lock,
+  Send,
 } from "lucide-react";
 
 type Settings = Record<string, string>;
@@ -144,6 +145,9 @@ export default function SettingsAdmin() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [activeId, setActiveId] = useState(SECTIONS[0].id);
+  const [testEmailTo, setTestEmailTo] = useState("");
+  const [testEmailLoading, setTestEmailLoading] = useState(false);
+  const [testEmailResult, setTestEmailResult] = useState<{ ok: boolean; msg: string } | null>(null);
 
   useEffect(() => {
     if (!pin) return;
@@ -179,6 +183,20 @@ export default function SettingsAdmin() {
       setError(j.error ?? "Save failed");
     }
     setSaving(false);
+  };
+
+  const sendTestEmail = async () => {
+    if (!testEmailTo) return;
+    setTestEmailLoading(true);
+    setTestEmailResult(null);
+    const res = await fetch("/api/admin/test-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-pin": pin },
+      body: JSON.stringify({ to: testEmailTo }),
+    });
+    const j = await res.json().catch(() => ({})) as { error?: string };
+    setTestEmailResult(res.ok ? { ok: true, msg: "Test email sent!" } : { ok: false, msg: j.error ?? "Failed to send" });
+    setTestEmailLoading(false);
   };
 
   const current = SECTIONS.find((s) => s.id === activeId)!;
@@ -271,6 +289,33 @@ export default function SettingsAdmin() {
               </span>
             )}
           </div>
+
+          {activeId === "email" && (
+            <div className="mt-4 pt-4 border-t border-slate-800 space-y-2">
+              <p className="text-xs font-semibold text-slate-400">Send Test Email</p>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={testEmailTo}
+                  onChange={(e) => setTestEmailTo(e.target.value)}
+                  placeholder="recipient@example.com"
+                  className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500"
+                />
+                <button
+                  onClick={sendTestEmail}
+                  disabled={testEmailLoading || !testEmailTo}
+                  className="flex items-center gap-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  <Send size={14} /> {testEmailLoading ? "Sending…" : "Send"}
+                </button>
+              </div>
+              {testEmailResult && (
+                <p className={`text-xs ${testEmailResult.ok ? "text-green-400" : "text-red-400"}`}>
+                  {testEmailResult.msg}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

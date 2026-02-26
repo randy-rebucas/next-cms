@@ -1,0 +1,14 @@
+{
+  "id": "minimal",
+  "name": "Minimal",
+  "version": "1.0.0",
+  "description": "Clean, light, editorial theme. White background with a subtle accent color. Inherits all content templates from the Default theme.",
+  "author": "nextCMS",
+  "parent": "default",
+  "templates": ["home", "layout"],
+  "supports": ["menus", "custom-logo", "custom-colors"],
+  "menu-locations": {
+    "primary": "Primary Navigation",
+    "footer": "Footer Links"
+  }
+}

@@ -87,4 +87,7 @@ const PostSchema = new Schema<IPost>(
   { timestamps: true }
 );
 
+// Text index for full-text search (avoids Mixed/JSON content field which breaks text indexing)
+PostSchema.index({ title: "text", excerpt: "text", author_name: "text" });
+
 export const Post = models.Post ?? model<IPost>("Post", PostSchema);

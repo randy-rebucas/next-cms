@@ -1,6 +1,14 @@
 /**
- * Public homepage — delegates to the default theme's home template.
- * All layout, sections, and dummy-data fallbacks live in:
- *   src/themes/default/templates/home.tsx
+ * Public homepage — loads the active theme's home template via the theme loader.
+ * WordPress equivalent: front-page.php (dispatched through the template hierarchy)
+ *
+ * Using the loader (instead of a direct import) means switching the active theme
+ * in admin settings will immediately change the homepage template.
  */
-export { default } from "@/themes/default/templates/home";
+import { getActiveTheme, loadHomeTemplate } from "@/core/themes/loader";
+
+export default async function HomePage() {
+  const theme = await getActiveTheme();
+  const HomeTemplate = await loadHomeTemplate(theme);
+  return <HomeTemplate />;
+}

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongoose";
 import { Post } from "@/models/Post";
+import { Revision, MAX_REVISIONS_PER_POST } from "@/models/Revision";
 import { checkPin, ok, err } from "@/core/auth";
 import { triggerHook } from "@/core/plugins/hooks";
 import type { PostPayload } from "@/core/plugins/hooks";
@@ -37,6 +38,45 @@ export async function PUT(
   await connectDB();
 
   try {
+    // Snapshot current state as a revision before updating
+    const current = await Post.findById(id).lean() as {
+      title: string;
+      content: unknown;
+      excerpt?: string;
+      status: string;
+      author_name?: string;
+    } | null;
+
+    if (current) {
+      const latest = await Revision.findOne({ post: id })
+        .sort({ revisionNumber: -1 })
+        .select("revisionNumber")
+        .lean() as { revisionNumber: number } | null;
+
+      const nextNumber = (latest?.revisionNumber ?? 0) + 1;
+
+      await Revision.create({
+        post: id,
+        title: current.title,
+        content: current.content,
+        excerpt: current.excerpt,
+        status: current.status,
+        revisionNumber: nextNumber,
+        savedBy: current.author_name ?? "unknown",
+      });
+
+      // Prune old revisions to keep within limit
+      const allRevisions = await Revision.find({ post: id })
+        .sort({ revisionNumber: -1 })
+        .select("_id")
+        .lean() as { _id: unknown }[];
+
+      if (allRevisions.length > MAX_REVISIONS_PER_POST) {
+        const toDelete = allRevisions.slice(MAX_REVISIONS_PER_POST);
+        await Revision.deleteMany({ _id: { $in: toDelete.map((r) => r._id) } });
+      }
+    }
+
     const doc = await Post.findByIdAndUpdate(id, body, { new: true }).lean();
     if (!doc) return err("Not found", 404);
     await triggerHook("afterSavePost", doc as PostPayload);
@@ -57,5 +97,9 @@ export async function DELETE(
   await connectDB();
   const doc = await Post.findByIdAndDelete(id).lean();
   if (!doc) return err("Not found", 404);
+
+  // Also delete all revisions for this post
+  await Revision.deleteMany({ post: id });
+
   return ok({ deleted: true });
 }

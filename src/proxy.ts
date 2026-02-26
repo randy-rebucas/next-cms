@@ -9,14 +9,14 @@ import { authConfig } from "@/auth.config";
 const { auth } = NextAuth(authConfig);
 
 /**
- * Global middleware.
+ * Global proxy (Next.js 16 successor to middleware).
  *
  * - Public routes: pass through
  * - /admin/login: pass through (the login page itself)
  * - /admin/*: require a valid NextAuth session → redirect to /admin/login
  * - /api/users/*: require a valid NextAuth session → 401 JSON
  */
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Always allow Next.js internals, static files, and auth API

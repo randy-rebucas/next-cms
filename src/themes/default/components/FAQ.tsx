@@ -4,40 +4,38 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import type { FAQItem } from "@/models/content";
 
-const defaultFaqs = [
+const defaultFaqs: FAQItem[] = [
   {
+    id: "faq-default-1",
     q: "How does a free consultation work?",
-    a: "During your free initial consultation, we review the facts of your case, explain your legal options under Philippine law, and outline a potential strategy. There is no obligation to hire us. You may book online, by phone, or in person at our Quezon City office.",
+    a: "During your free initial consultation, we review the facts of your case, explain your legal options, and outline a potential strategy. There is no obligation to hire us. Contact us by phone, email, or through the form on this page to schedule your appointment.",
   },
   {
-    q: "What is the difference between plunder and malversation?",
-    a: "Malversation (Article 217, Revised Penal Code) involves a public officer misappropriating public funds entrusted to them. Plunder (RA 7080) involves a public officer amassing ill-gotten wealth of at least ₱50 million through a series of overt criminal acts. Plunder carries a heavier penalty including reclusion perpetua.",
+    id: "faq-default-2",
+    q: "How much does it cost to hire an attorney?",
+    a: "Legal fees depend on the complexity of the case and the type of service needed. We offer free initial consultations and will provide a clear fee structure before any engagement. Some cases may qualify for contingency fee arrangements — meaning you pay nothing unless we win.",
   },
   {
-    q: "Who can file a complaint before the Ombudsman?",
-    a: "Any person can file a complaint before the Office of the Ombudsman against a public official or employee for acts related to their official duties, including graft, corruption, and misconduct. The complaint must be supported by affidavits and documentary evidence.",
+    id: "faq-default-3",
+    q: "How long will my case take?",
+    a: "The timeline varies significantly depending on the type of case, court schedules, and whether the matter is settled or goes to trial. During your consultation we will give you a realistic estimate based on the specifics of your situation.",
   },
   {
-    q: "What is the Sandiganbayan and what cases does it handle?",
-    a: "The Sandiganbayan is a special anti-graft court in the Philippines with jurisdiction over criminal and civil cases involving public officials with Salary Grade 27 and above, charged with violations of the Anti-Graft and Corrupt Practices Act (RA 3019), plunder, malversation, and related offenses.",
+    id: "faq-default-4",
+    q: "What should I bring to my first appointment?",
+    a: "Bring any documents related to your case — contracts, correspondence, court notices, photographs, or any other evidence you have. The more information you can share, the better we can assess your situation and advise you on the best course of action.",
   },
   {
-    q: "How long do I have to file a criminal complaint in the Philippines?",
-    a: "Prescriptive periods vary: plunder – 20 years; malversation – depends on the penalty, typically 10–20 years; violations of RA 3019 (anti-graft) – 15 years from discovery. It is critical to consult an attorney as soon as possible to avoid missing filing deadlines.",
+    id: "faq-default-5",
+    q: "Is everything I tell my attorney confidential?",
+    a: "Yes. Attorney-client privilege protects all communications between you and your lawyer. We cannot disclose what you tell us without your consent, with very limited exceptions defined by law. You can speak freely and honestly so we can provide the best possible advice.",
   },
   {
-    q: "Can I remain anonymous when reporting corruption?",
-    a: "While complaints generally require identification, the Ombudsman has mechanisms to protect whistleblowers. Republic Act No. 6981 (Witness Protection Program) provides protection for those who testify against public officials. Atty. Baligod specializes in guiding whistleblowers through this process safely.",
+    id: "faq-default-6",
+    q: "Do I need an attorney or can I handle my case myself?",
+    a: "While you have the right to represent yourself, legal proceedings involve complex rules of procedure and evidence. Even in straightforward matters, an experienced attorney can identify issues you might overlook and significantly improve your outcome. A consultation costs nothing and can help you decide.",
   },
-  {
-    q: "What is the PDAF or \u2018pork barrel\u2019 scam?",
-    a: "The Priority Development Assistance Fund (PDAF) scam involved legislators allegedly channeling their discretionary government funds through Janet Lim-Napoles\u2019 network of fake NGOs, siphoning billions in public money. Atty. Baligod served as lead counsel for the key government whistleblowers in these landmark cases.",
-  },
-  {
-    q: "How do I know if I have a strong anti-corruption case?",
-    a: "A strong case requires: (1) clear evidence of a public official's act or omission; (2) proof of damage to government or unjust enrichment; (3) documentary evidence such as contracts, receipts, COA reports, or audit findings; and (4) a complaint filed within the prescriptive period. A consultation with Atty. Baligod can help assess your specific situation.",
-  },
-] as FAQItem[];
+];
 
 export default function FAQ({ faqs = defaultFaqs }: { faqs?: FAQItem[] }) {
   const [open, setOpen] = useState<number | null>(null);
@@ -57,7 +55,7 @@ export default function FAQ({ faqs = defaultFaqs }: { faqs?: FAQItem[] }) {
         <div className="space-y-3">
           {faqs.map((faq, i) => (
             <div
-              key={i}
+              key={faq.id || i}
               className={`border rounded-xl overflow-hidden transition-colors ${
                 open === i ? "border-amber-400" : "border-slate-200 hover:border-slate-300"
               }`}
