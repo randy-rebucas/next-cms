@@ -57,20 +57,6 @@ export default function TipTapEditor({ content, onChange, placeholder = "Start w
 
   if (!editor) return null;
 
-  const btn = (active: boolean, label: string, action: () => void) => (
-    <button
-      key={label}
-      type="button"
-      title={label}
-      onClick={action}
-      className={`p-1.5 rounded transition-colors ${
-        active ? "bg-amber-600 text-white" : "text-slate-400 hover:bg-slate-700 hover:text-white"
-      }`}
-    >
-      {label}
-    </button>
-  );
-
   const iconBtn = (active: boolean, Icon: React.ElementType, label: string, action: () => void) => (
     <button
       key={label}

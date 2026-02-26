@@ -26,7 +26,6 @@ export default function Video({ block }: { block: VideoBlock }) {
     <figure className="my-6">
       <div className="relative w-full overflow-hidden rounded-xl bg-slate-800 aspect-video">
         {isDirect ? (
-          // eslint-disable-next-line jsx-a11y/media-has-caption
           <video
             src={embedUrl}
             controls

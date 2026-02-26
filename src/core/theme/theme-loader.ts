@@ -18,7 +18,7 @@ import type { CategoryTemplateProps } from "@/themes/default/templates/category"
 import type { SearchTemplateProps } from "@/themes/default/templates/search";
 import type { NotFoundTemplateProps } from "@/themes/default/templates/404";
 import type React from "react";
-import { REGISTRY, validateTheme } from "./theme-registry";
+import { validateTheme } from "./theme-registry";
 import { resolveEntry } from "./fallback";
 import { logThemeWarn } from "./theme-logger";
 import type { ThemeName } from "./theme-registry";

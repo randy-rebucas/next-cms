@@ -56,7 +56,7 @@ const EMPTY: Partial<UserRow & { password: string }> = {
 };
 
 export default function UsersPage() {
-  const { pin: _pin } = useAdminAuth();
+  const { pin: _pin } = useAdminAuth(); // pin reserved for future admin-only API calls
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<"create" | "edit" | null>(null);
@@ -73,7 +73,8 @@ export default function UsersPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load(); }, []);
 
   const showToast = (msg: string) => {
     setToast(msg);

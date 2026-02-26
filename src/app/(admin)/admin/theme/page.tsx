@@ -103,6 +103,9 @@ export default function ThemeAdmin() {
 
   useEffect(() => {
     if (!pin) return;
+    // loadThemes is a useCallback that triggers setState — this is intentional
+    // (data-fetching on mount), not a cascading render anti-pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadThemes();
     // Load current siteTheme for customize tab
     fetch("/api/db/settings", { headers: { "x-admin-pin": pin } })

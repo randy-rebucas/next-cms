@@ -47,9 +47,6 @@ export default function PostsList() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Reset page when filter/search changes
-  useEffect(() => { setPage(1); }, [filter, search]);
-
   const del = async (id: string) => {
     if (!confirm("Delete this post?")) return;
     setDeleting(id);
@@ -84,7 +81,7 @@ export default function PostsList() {
           {(["all", "published", "draft"] as const).map((f) => (
             <button
               key={f}
-              onClick={() => setFilter(f)}
+              onClick={() => { setFilter(f); setPage(1); }}
               className={`px-3 py-1.5 text-xs font-medium rounded capitalize transition-colors ${
                 filter === f ? "bg-amber-600 text-white" : "text-slate-400 hover:text-white"
               }`}
@@ -99,7 +96,7 @@ export default function PostsList() {
             type="text"
             placeholder="Search posts…"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500"
           />
         </div>

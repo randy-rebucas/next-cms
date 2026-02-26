@@ -36,9 +36,9 @@ export default function CommentsAdmin() {
   const [page, setPage] = useState(1);
   const [actioning, setActioning] = useState<string | null>(null);
 
-  const load = useCallback(() => {
+  const load = useCallback((pageNum = page) => {
     if (!pin) return;
-    const params = new URLSearchParams({ limit: "20", page: String(page) });
+    const params = new URLSearchParams({ limit: "20", page: String(pageNum) });
     if (filter !== "all") params.set("status", filter);
     fetch(`/api/db/comments?${params}`, { headers: { "x-admin-pin": pin } })
       .then((r) => r.json())
@@ -48,8 +48,11 @@ export default function CommentsAdmin() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Reset to page 1 when filter changes
-  useEffect(() => { setPage(1); }, [filter]);
+  // Reset to page 1 when filter changes (without triggering cascade)
+  const handleFilterChange = (f: StatusFilter) => {
+    setFilter(f);
+    setPage(1);
+  };
 
   const updateStatus = async (id: string, status: "approved" | "pending" | "spam") => {
     setActioning(id);
@@ -88,7 +91,7 @@ export default function CommentsAdmin() {
         {(["pending", "approved", "spam", "all"] as StatusFilter[]).map((f) => (
           <button
             key={f}
-            onClick={() => setFilter(f)}
+            onClick={() => handleFilterChange(f)}
             className={`px-3 py-1.5 text-xs font-medium rounded capitalize transition-colors ${
               filter === f ? "bg-amber-600 text-white" : "text-slate-400 hover:text-white"
             }`}

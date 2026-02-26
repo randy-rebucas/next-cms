@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Scale,
   Database,
@@ -574,18 +575,18 @@ export default function SetupPage() {
                 <p>In <strong>development</strong>, Next.js will restart automatically.</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a
+                <Link
                   href="/admin/login"
                   className="px-8 py-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-xl transition-colors inline-flex items-center gap-2 justify-center"
                 >
                   Log In <ArrowRight size={16} />
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/"
                   className="px-8 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-medium rounded-xl transition-colors inline-flex items-center gap-2 justify-center"
                 >
                   Visit Site
-                </a>
+                </Link>
               </div>
 
               <p className="text-xs text-slate-600 mt-6 flex items-center justify-center gap-1">
@@ -602,9 +603,9 @@ export default function SetupPage() {
       {step !== "loading" && step !== "complete" && step !== "installing" && (
         <p className="text-xs text-slate-600 mt-6">
           Already set up?{" "}
-          <a href="/admin/login" className="text-amber-600 hover:text-amber-400 transition-colors">
+          <Link href="/admin/login" className="text-amber-600 hover:text-amber-400 transition-colors">
             Log in to admin
-          </a>
+          </Link>
         </p>
       )}
     </div>

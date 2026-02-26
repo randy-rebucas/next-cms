@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongoose";
 import { Media } from "@/models/Media";
 import { checkPin, ok, err } from "@/core/auth";
+import path from "path";
+import fs from "fs";
 
 export async function PUT(
   req: NextRequest,
@@ -31,7 +33,18 @@ export async function DELETE(
   const { id } = await params;
 
   await connectDB();
-  const doc = await Media.findByIdAndDelete(id).lean();
+  const doc = await Media.findByIdAndDelete(id).lean() as { url?: string } | null;
   if (!doc) return err("Not found", 404);
+
+  // Delete the physical file from disk
+  if (doc.url) {
+    try {
+      const filePath = path.join(process.cwd(), "public", doc.url);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    } catch {
+      // Non-fatal: DB record is deleted; log silently
+    }
+  }
+
   return ok({ deleted: true });
 }

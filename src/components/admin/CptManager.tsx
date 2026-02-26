@@ -31,6 +31,7 @@ export default function CptManager<T extends { id: number }>({
   const [error, setError] = useState("");
 
   const load = () => fetch(apiBase).then((r) => r.json()).then(setItems);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [apiBase]);
 
   const startNew = () => {

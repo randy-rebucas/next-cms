@@ -74,9 +74,8 @@ export async function POST(req: NextRequest) {
 
   // Notify admin (fire-and-forget — don't block response)
   try {
-    const [adminEmailRow, siteUrlRow, siteNameRow] = await Promise.all([
+    const [adminEmailRow, siteNameRow] = await Promise.all([
       Setting.findOne({ key: "adminEmail" }).lean() as Promise<{ value?: string } | null>,
-      Setting.findOne({ key: "siteUrl" }).lean() as Promise<{ value?: string } | null>,
       Setting.findOne({ key: "siteName" }).lean() as Promise<{ value?: string } | null>,
     ]);
 

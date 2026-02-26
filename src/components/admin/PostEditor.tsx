@@ -98,6 +98,7 @@ export default function PostEditor({ initial }: { initial?: Partial<PostData> })
     }
   }, [postId, pin]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { if (postId) loadRevisions(); }, [postId, loadRevisions]);
 
   const restoreRevision = async (revId: string) => {

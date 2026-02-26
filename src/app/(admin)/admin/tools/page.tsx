@@ -291,7 +291,7 @@ export default function ToolsPage() {
             <>
               <FileJson size={28} className="mx-auto text-slate-600 mb-2" />
               <p className="text-sm text-slate-300 font-medium">Drop export.json here or click to browse</p>
-              <p className="text-xs text-slate-500 mt-1">Only .json files from this system's Export tool</p>
+              <p className="text-xs text-slate-500 mt-1">Only .json files from this system&apos;s Export tool</p>
             </>
           )}
         </div>

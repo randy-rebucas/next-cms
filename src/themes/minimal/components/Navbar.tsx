@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
@@ -24,7 +25,7 @@ export default function MinimalNavbar({ items = [], siteName = "Law Firm", logoU
         {/* Logo / site name */}
         <Link href="/" className="flex items-center gap-2">
           {logoUrl ? (
-            <img src={logoUrl} alt={siteName} className="h-7 w-auto object-contain" />
+            <Image src={logoUrl} alt={siteName} width={112} height={28} className="h-7 w-auto object-contain" />
           ) : (
             <span className="font-bold text-slate-900 text-base tracking-tight">
               {siteName}

@@ -6,7 +6,7 @@ import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongoose";
 import { Post } from "@/models/Post";
 import { Page } from "@/models/Page";
-import { checkPin, ok, err } from "@/core/auth";
+import { checkPin, ok } from "@/core/auth";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
@@ -43,11 +43,11 @@ export async function GET(req: NextRequest) {
 
   // Environment config checks (values hidden, only presence shown)
   const envChecks = [
-    { key: "MONGODB_URI",       set: !!process.env.MONGODB_URI },
-    { key: "NEXTAUTH_SECRET",   set: !!process.env.NEXTAUTH_SECRET },
-    { key: "NEXTAUTH_URL",      set: !!process.env.NEXTAUTH_URL },
-    { key: "SMTP_HOST",         set: !!process.env.SMTP_HOST },
-    { key: "ADMIN_PIN",         set: !!process.env.ADMIN_PIN },
+    { key: "MONGODB_URI",  set: !!process.env.MONGODB_URI },
+    { key: "AUTH_SECRET",  set: !!process.env.AUTH_SECRET },
+    { key: "NEXTAUTH_URL", set: !!process.env.NEXTAUTH_URL },
+    { key: "SMTP_HOST",    set: !!process.env.SMTP_HOST },
+    { key: "ADMIN_PIN",    set: !!process.env.ADMIN_PIN },
   ];
 
   return ok({

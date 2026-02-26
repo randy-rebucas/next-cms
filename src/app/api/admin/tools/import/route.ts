@@ -42,7 +42,8 @@ export async function POST(req: NextRequest) {
     if (exists) { results.posts.skipped++; continue; }
     try {
       // Strip MongoDB internal fields so Mongoose generates fresh ones
-      const { _id: _a, __v: _b, createdAt: _c, updatedAt: _d, ...clean } = raw as Record<string, unknown>;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, __v, createdAt, updatedAt, ...clean } = raw as Record<string, unknown>;
       await Post.create(clean);
       results.posts.inserted++;
     } catch {
@@ -57,7 +58,8 @@ export async function POST(req: NextRequest) {
     const exists = await Page.exists({ slug });
     if (exists) { results.pages.skipped++; continue; }
     try {
-      const { _id: _a, __v: _b, createdAt: _c, updatedAt: _d, ...clean } = raw as Record<string, unknown>;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, __v, createdAt, updatedAt, ...clean } = raw as Record<string, unknown>;
       await Page.create(clean);
       results.pages.inserted++;
     } catch {

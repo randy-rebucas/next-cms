@@ -104,10 +104,6 @@ export default function AdminLoginPage() {
             {loading ? "Signing in…" : "Sign In"}
           </button>
         </form>
-
-        <p className="text-center text-xs text-slate-600 mt-6">
-          Default: admin@baligod.law / admin
-        </p>
       </div>
     </div>
   );

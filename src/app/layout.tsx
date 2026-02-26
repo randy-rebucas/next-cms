@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import connectDB from "@/lib/mongoose";
 import { Setting } from "@/models/Setting";
@@ -8,6 +9,38 @@ import { getActiveTheme, loadThemeStyles } from "@/core/themes/loader";
 import { triggerHook } from "@/core/plugins/hooks";
 import "@/plugins/bootstrap";
 import "@/themes/bootstrap";
+
+/**
+ * Parse raw HTML script strings (from plugins) into renderable React elements.
+ * Supports:
+ *   - External scripts:  <script async src="https://…"></script>
+ *   - Inline scripts:    <script>…content…</script>
+ */
+function HeadScript({ html, idx }: { html: string; idx: number }) {
+  // External script with src attribute
+  const srcMatch = html.match(/<script[^>]+src=["']([^"']+)["'][^>]*>/i);
+  if (srcMatch) {
+    const isDefer = /\bdefer\b/i.test(html);
+    return (
+      <Script
+        key={idx}
+        src={srcMatch[1]}
+        strategy={isDefer ? "afterInteractive" : "afterInteractive"}
+      />
+    );
+  }
+  // Inline script
+  const inlineMatch = html.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
+  if (inlineMatch) {
+    return (
+      <script
+        key={idx}
+        dangerouslySetInnerHTML={{ __html: inlineMatch[1] }}
+      />
+    );
+  }
+  return null;
+}
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -74,10 +107,7 @@ export default async function RootLayout({
           <style dangerouslySetInnerHTML={{ __html: assetCss }} />
         )}
         {headScripts.map((script, i) => (
-          <div
-            key={i}
-            dangerouslySetInnerHTML={{ __html: script }}
-          />
+          <HeadScript key={i} html={script} idx={i} />
         ))}
       </head>
       <body
