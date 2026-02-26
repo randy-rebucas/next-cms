@@ -2,13 +2,7 @@
 
 import { useAdminAuth } from "@/app/(admin)/admin/layout";
 import CptManager from "@/components/admin/CptManager";
-
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-}
+import { ICategory } from "@/models/Category";
 
 const FIELDS = [
   { key: "name", label: "Name", type: "text" as const, placeholder: "Anti-Corruption" },
@@ -23,7 +17,7 @@ export default function CategoriesAdmin() {
   const { pin } = useAdminAuth();
 
   return (
-    <CptManager<Category>
+    <CptManager<ICategory>
       title="Categories"
       apiBase="/api/db/categories"
       fields={FIELDS}

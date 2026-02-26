@@ -12,20 +12,14 @@ import {
   FONT_OPTIONS,
   RADIUS_OPTIONS,
 } from "@/core/themes";
+import type { ITheme } from "@/models/Theme";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface ThemeInfo {
-  key: string;
-  name: string;
-  description: string;
-  version: string;
-  author: string;
+type ThemeInfo = Pick<ITheme, "key" | "name" | "description" | "version" | "author" | "isActive" | "colors"> & {
   screenshot: string | null;
-  isActive: boolean;
   isBuiltIn: boolean;
-  colors?: Record<string, string>;
-}
+};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

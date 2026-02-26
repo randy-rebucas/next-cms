@@ -7,24 +7,13 @@ import {
   Globe, FileText, Layout, FolderOpen,
 } from "lucide-react";
 import { useAdminAuth } from "../layout";
+import type { IMenuItem, IMenu } from "@/models/Menu";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface MenuItem {
-  _id?: string;
-  label: string;
-  type: "page" | "post" | "custom" | "category";
-  url: string;
-  target: "_self" | "_blank";
-  order: number;
-}
-
-interface MenuDoc {
-  _id: string;
-  name: string;
-  location: string;
-  items: MenuItem[];
-}
+// JSON-serialized versions of model types (_id is string from API responses)
+type MenuItem = Omit<IMenuItem, "_id"> & { _id?: string };
+type MenuDoc = Pick<IMenu, "name" | "location"> & { _id: string; items: MenuItem[] };
 
 interface LinkOption { label: string; url: string; type: MenuItem["type"] }
 

@@ -2,12 +2,7 @@
 
 import { useAdminAuth } from "@/app/(admin)/admin/layout";
 import CptManager from "@/components/admin/CptManager";
-
-interface Tag {
-  id: number;
-  name: string;
-  slug: string;
-}
+import type { ITag } from "@/models/Tag";
 
 const FIELDS = [
   { key: "name", label: "Tag Name", type: "text" as const, placeholder: "whistleblower" },
@@ -21,7 +16,7 @@ export default function TagsAdmin() {
   const { pin } = useAdminAuth();
 
   return (
-    <CptManager<Tag>
+    <CptManager<ITag>
       title="Tags"
       apiBase="/api/db/tags"
       fields={FIELDS}

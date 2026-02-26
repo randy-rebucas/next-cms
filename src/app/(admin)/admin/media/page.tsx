@@ -3,17 +3,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useAdminAuth } from "@/app/(admin)/admin/layout";
 import { UploadCloud, Trash2, Copy, CheckCircle, Image as ImageIcon, Loader2 } from "lucide-react";
+import type { IMedia } from "@/models/Media";
 
-interface MediaItem {
+type MediaItem = Required<Pick<IMedia, "filename" | "original_name" | "mime_type" | "size_bytes" | "alt" | "url">> & {
   _id: string;
-  filename: string;
-  original_name: string;
-  mime_type: string;
-  size_bytes: number;
-  alt: string;
-  url: string;
   createdAt: string;
-}
+};
 
 function fmt(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;

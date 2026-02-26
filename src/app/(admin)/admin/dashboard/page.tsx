@@ -7,6 +7,8 @@ import {
   PlusCircle, Settings, FolderOpen, Tag, ExternalLink, AlertCircle,
 } from "lucide-react";
 import { useAdminAuth } from "@/app/(admin)/admin/layout";
+import { IPost } from "@/models/Post";
+import { IComment } from "@/models/Comment";
 
 interface Stats {
   posts_total: number;
@@ -20,21 +22,6 @@ interface Stats {
   comments_total: number;
 }
 
-interface Post {
-  _id: string;
-  title: string;
-  status: "published" | "draft" | string;
-  author_name?: string;
-  createdAt: string;
-}
-
-interface Comment {
-  _id: string;
-  authorName: string;
-  content: string;
-  createdAt: string;
-}
-
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-PH", {
     month: "short", day: "numeric", year: "numeric",
@@ -44,8 +31,8 @@ function fmtDate(iso: string) {
 export default function Dashboard() {
   const { pin } = useAdminAuth();
   const [stats, setStats] = useState<Stats | null>(null);
-  const [recent, setRecent] = useState<Post[]>([]);
-  const [pendingComments, setPendingComments] = useState<Comment[]>([]);
+  const [recent, setRecent] = useState<IPost[]>([]);
+  const [pendingComments, setPendingComments] = useState<IComment[]>([]);
   const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
@@ -226,11 +213,11 @@ export default function Dashboard() {
           ) : (
             <ul className="divide-y divide-slate-800">
               {recent.map((p) => (
-                <li key={p._id} className="flex items-center justify-between px-5 py-3 hover:bg-slate-800/50 group">
+                <li key={p._id.toString()} className="flex items-center justify-between px-5 py-3 hover:bg-slate-800/50 group">
                   <div className="min-w-0">
                     <p className="text-sm text-slate-200 truncate group-hover:text-white">{p.title}</p>
                     <p className="text-xs text-slate-500">
-                      {p.author_name || "Unknown"} · {fmtDate(p.createdAt)}
+                      {p.author_name || "Unknown"} · {fmtDate(p.createdAt.toISOString())}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0 ml-4">
@@ -273,10 +260,10 @@ export default function Dashboard() {
           ) : (
             <ul className="divide-y divide-slate-800">
               {pendingComments.map((c) => (
-                <li key={c._id} className="px-5 py-3 hover:bg-slate-800/50">
+                <li key={c._id.toString()} className="px-5 py-3 hover:bg-slate-800/50">
                   <p className="text-sm font-medium text-slate-200">{c.authorName}</p>
                   <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">{c.content}</p>
-                  <p className="text-xs text-slate-600 mt-0.5">{fmtDate(c.createdAt)}</p>
+                  <p className="text-xs text-slate-600 mt-0.5">{fmtDate(c.createdAt.toISOString())}</p>
                 </li>
               ))}
             </ul>

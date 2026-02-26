@@ -2,12 +2,13 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { PlusCircle, Pencil, Trash2, ChevronDown, Check, X, GripVertical } from "lucide-react";
+import { Types } from "mongoose";
 
 type FieldDef =
   | { key: string; label: string; type: "text" | "textarea" | "select"; options?: { label: string; value: string }[]; placeholder?: string }
   | { key: string; label: string; type: "json"; hint?: string };
 
-interface CptManagerProps<T extends { id: number }> {
+interface CptManagerProps<T extends { _id: Types.ObjectId }> {
   title: string;
   apiBase: string; // e.g. /api/db/practice-areas
   fields: FieldDef[];
@@ -16,7 +17,7 @@ interface CptManagerProps<T extends { id: number }> {
   pin: string;
 }
 
-export default function CptManager<T extends { id: number }>({
+export default function CptManager<T extends { _id: Types.ObjectId }>({
   title,
   apiBase,
   fields,
@@ -25,7 +26,7 @@ export default function CptManager<T extends { id: number }>({
   pin,
 }: CptManagerProps<T>) {
   const [items, setItems] = useState<T[]>([]);
-  const [editingId, setEditingId] = useState<number | "new" | null>(null);
+  const [editingId, setEditingId] = useState<Types.ObjectId | "new" | null>(null);
   const [form, setForm] = useState<Record<string, unknown>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -42,7 +43,7 @@ export default function CptManager<T extends { id: number }>({
 
   const startEdit = (item: T) => {
     setForm({ ...(item as Record<string, unknown>) });
-    setEditingId(item.id);
+    setEditingId(item._id);
     setError("");
   };
 
@@ -79,7 +80,7 @@ export default function CptManager<T extends { id: number }>({
     setSaving(false);
   };
 
-  const del = async (id: number) => {
+  const del = async (id: Types.ObjectId) => {
     if (!confirm("Delete this item?")) return;
     await fetch(`${apiBase}/${id}`, { method: "DELETE", headers: { "x-admin-pin": pin } });
     await load();
@@ -166,7 +167,7 @@ export default function CptManager<T extends { id: number }>({
           </p>
         )}
         {items.map((item) => (
-          <div key={item.id} className={`border rounded-xl overflow-hidden transition-colors ${editingId === item.id ? "border-amber-500/40" : "border-slate-800"}`}>
+          <div key={item._id.toString()} className={`border rounded-xl overflow-hidden transition-colors ${editingId === item._id ? "border-amber-500/40" : "border-slate-800"}`}>
             {/* Row header */}
             <div className="flex items-center justify-between px-4 py-3 bg-slate-900">
               <div className="flex items-center gap-3 min-w-0">
@@ -175,19 +176,19 @@ export default function CptManager<T extends { id: number }>({
               </div>
               <div className="flex items-center gap-1 shrink-0 ml-3">
                 <button
-                  onClick={() => editingId === item.id ? cancel() : startEdit(item)}
+                  onClick={() => editingId === item._id ? cancel() : startEdit(item)}
                   className="p-1.5 text-slate-400 hover:text-amber-400 transition-colors"
                   title="Edit"
                 >
-                  {editingId === item.id ? <ChevronDown size={15} className="rotate-180" /> : <Pencil size={15} />}
+                  {editingId === item._id ? <ChevronDown size={15} className="rotate-180" /> : <Pencil size={15} />}
                 </button>
-                <button onClick={() => del(item.id)} className="p-1.5 text-slate-500 hover:text-red-400 transition-colors" title="Delete">
+                <button onClick={() => del(item._id)} className="p-1.5 text-slate-500 hover:text-red-400 transition-colors" title="Delete">
                   <Trash2 size={15} />
                 </button>
               </div>
             </div>
             {/* Edit form inline */}
-            {editingId === item.id && (
+            {editingId === item._id && (
               <div className="border-t border-slate-800 px-4 py-4 bg-slate-900/70">
                 <div className="grid sm:grid-cols-2 gap-4">
                   {fields.map((f) => (

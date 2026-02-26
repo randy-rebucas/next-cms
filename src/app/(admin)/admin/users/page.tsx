@@ -14,15 +14,14 @@ import {
   BookOpen,
 } from "lucide-react";
 import type { Role } from "@/core/rbac";
+import type { IUser } from "@/models/User";
 
-interface UserRow {
+type UserRow = Pick<IUser, "role" | "permissions"> & {
   _id: string;
   name: string;
   email: string;
-  role: Role;
-  permissions: string[];
   createdAt: string;
-}
+};
 
 const ROLE_LABELS: Record<Role, { label: string; color: string; icon: React.ReactNode }> = {
   admin: {

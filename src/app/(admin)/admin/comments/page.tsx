@@ -3,19 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAdminAuth } from "@/app/(admin)/admin/layout";
 import { MessageSquare, CheckCircle, XCircle, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
-
-interface Comment {
-  _id: string;
-  post: string;
-  authorName: string;
-  authorEmail: string;
-  content: string;
-  status: "approved" | "pending" | "spam";
-  createdAt: string;
-}
+import { IComment } from "@/models/Comment";
 
 interface CommentPage {
-  data: Comment[];
+  data: IComment[];
   total: number;
   page: number;
   pages: number;
@@ -118,7 +109,7 @@ export default function CommentsAdmin() {
         ) : (
           <div className="divide-y divide-slate-800">
             {comments.map((c) => (
-              <div key={c._id} className="px-5 py-4 hover:bg-slate-800/40 transition-colors">
+              <div key={c._id.toString()} className="px-5 py-4 hover:bg-slate-800/40 transition-colors">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -129,15 +120,15 @@ export default function CommentsAdmin() {
                       </span>
                     </div>
                     <p className="text-slate-300 text-sm leading-relaxed line-clamp-3 mb-1">{c.content}</p>
-                    <p className="text-xs text-slate-600">{fmtDateTime(c.createdAt)}</p>
+                    <p className="text-xs text-slate-600">{fmtDateTime(c.createdAt.toISOString())}</p>
                   </div>
 
                   {/* Actions */}
                   <div className="flex items-center gap-1 shrink-0">
                     {c.status !== "approved" && (
                       <button
-                        onClick={() => updateStatus(c._id, "approved")}
-                        disabled={actioning === c._id}
+                        onClick={() => updateStatus(c._id.toString(), "approved")}
+                        disabled={actioning === c._id.toString()}
                         title="Approve"
                         className="p-1.5 text-slate-400 hover:text-green-400 transition-colors disabled:opacity-40"
                       >
@@ -146,8 +137,8 @@ export default function CommentsAdmin() {
                     )}
                     {c.status !== "spam" && (
                       <button
-                        onClick={() => updateStatus(c._id, "spam")}
-                        disabled={actioning === c._id}
+                        onClick={() => updateStatus(c._id.toString(), "spam")}
+                        disabled={actioning === c._id.toString()}
                         title="Mark as spam"
                         className="p-1.5 text-slate-400 hover:text-amber-400 transition-colors disabled:opacity-40"
                       >
@@ -155,8 +146,8 @@ export default function CommentsAdmin() {
                       </button>
                     )}
                     <button
-                      onClick={() => deleteComment(c._id)}
-                      disabled={actioning === c._id}
+                      onClick={() => deleteComment(c._id.toString())}
+                      disabled={actioning === c._id.toString()}
                       title="Delete"
                       className="p-1.5 text-slate-400 hover:text-red-400 transition-colors disabled:opacity-40"
                     >

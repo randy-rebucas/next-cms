@@ -1,6 +1,7 @@
 import mongoose, { Schema, model, models, Document, Types } from "mongoose";
 
 export interface IPost extends Document {
+  _id: Types.ObjectId;
   title: string;
   slug: string;
   /** JSON block-based content or HTML string */

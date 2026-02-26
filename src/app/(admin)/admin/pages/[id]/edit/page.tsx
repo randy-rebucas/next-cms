@@ -5,20 +5,11 @@ import { useAdminAuth } from "@/app/(admin)/admin/layout";
 import PageEditor from "@/components/admin/PageEditor";
 import { notFound } from "next/navigation";
 import { use } from "react";
+import type { IPage } from "@/models/Page";
 
-interface PageRow {
-  id: number;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string;
+type PageRow = Pick<IPage, "title" | "slug" | "content" | "excerpt" | "author" | "featured_image" | "meta_title" | "meta_description" | "og_image"> & {
   status: "draft" | "published";
-  author: string;
-  featured_image: string;
-  meta_title: string;
-  meta_description: string;
-  og_image: string;
-}
+};
 
 export default function EditPageAdmin({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
