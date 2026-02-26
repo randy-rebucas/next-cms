@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   FileText, Layout, Image as ImageIcon, MessageSquare,
-  PlusCircle, Settings, FolderOpen, Tag,
+  PlusCircle, Settings, FolderOpen, Tag, ExternalLink, AlertCircle,
 } from "lucide-react";
 import { useAdminAuth } from "@/app/(admin)/admin/layout";
 
@@ -23,7 +23,7 @@ interface Stats {
 interface Post {
   _id: string;
   title: string;
-  status: string;
+  status: "published" | "draft" | string;
   author_name?: string;
   createdAt: string;
 }
@@ -35,50 +35,71 @@ interface Comment {
   createdAt: string;
 }
 
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-PH", {
+    month: "short", day: "numeric", year: "numeric",
+  });
+}
+
 export default function Dashboard() {
   const { pin } = useAdminAuth();
   const [stats, setStats] = useState<Stats | null>(null);
   const [recent, setRecent] = useState<Post[]>([]);
   const [pendingComments, setPendingComments] = useState<Comment[]>([]);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     if (!pin) return;
+    let cancelled = false;
     (async () => {
       try {
         const h = { "x-admin-pin": pin };
-        const [postsRes, pagesRes, mediaRes, catsRes, tagsRes, commentsAllRes, commentsPendingRes] =
-          await Promise.all([
-            fetch("/api/db/posts", { headers: h }).then((r) => r.json()),
-            fetch("/api/db/pages", { headers: h }).then((r) => r.json()),
-            fetch("/api/db/media", { headers: h }).then((r) => r.json()),
-            fetch("/api/db/categories", { headers: h }).then((r) => r.json()),
-            fetch("/api/db/tags", { headers: h }).then((r) => r.json()),
-            fetch("/api/db/comments?limit=1", { headers: h }).then((r) => r.json()),
-            fetch("/api/db/comments?status=pending&limit=5", { headers: h }).then((r) => r.json()),
-          ]);
+        const [
+          postsRes,
+          publishedRes,
+          pagesRes,
+          mediaRes,
+          catsRes,
+          tagsRes,
+          commentsAllRes,
+          commentsPendingRes,
+        ] = await Promise.all([
+          // page=1&limit=5 → returns { data, total } — recent posts + accurate total
+          fetch("/api/db/posts?page=1&limit=5", { headers: h }).then((r) => r.json()),
+          // accurate published count without fetching all docs
+          fetch("/api/db/posts?status=published&page=1&limit=1", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/pages?page=1&limit=1", { headers: h }).then((r) => r.json()),
+          fetch("/api/media", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/categories", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/tags", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/comments?limit=1", { headers: h }).then((r) => r.json()),
+          fetch("/api/db/comments?status=pending&limit=5", { headers: h }).then((r) => r.json()),
+        ]);
 
-        const posts = Array.isArray(postsRes) ? postsRes : (postsRes.data ?? []);
+        if (cancelled) return;
+
+        const postsTotal   = postsRes.total     ?? 0;
+        const publishedTotal = publishedRes.total ?? 0;
 
         setStats({
-          posts_total:      Array.isArray(postsRes) ? postsRes.length : (postsRes.total ?? 0),
-          posts_published:  posts.filter((p: Post) => p.status === "published").length,
-          posts_draft:      posts.filter((p: Post) => p.status === "draft").length,
-          pages:            Array.isArray(pagesRes) ? pagesRes.length : (pagesRes.total ?? 0),
+          posts_total:      postsTotal,
+          posts_published:  publishedTotal,
+          posts_draft:      postsTotal - publishedTotal,
+          pages:            pagesRes.total   ?? 0,
           media:            Array.isArray(mediaRes) ? mediaRes.length : 0,
           categories:       Array.isArray(catsRes)  ? catsRes.length  : 0,
-          tags:             Array.isArray(tagsRes)   ? tagsRes.length   : 0,
-          comments_total:   commentsAllRes.total     ?? 0,
-          comments_pending: commentsPendingRes.total  ?? 0,
+          tags:             Array.isArray(tagsRes)   ? tagsRes.length  : 0,
+          comments_total:   commentsAllRes.total    ?? 0,
+          comments_pending: commentsPendingRes.total ?? 0,
         });
 
-        setRecent(posts.slice(0, 5));
-        setPendingComments(
-          Array.isArray(commentsPendingRes.data) ? commentsPendingRes.data : []
-        );
+        setRecent(Array.isArray(postsRes.data) ? postsRes.data : []);
+        setPendingComments(Array.isArray(commentsPendingRes.data) ? commentsPendingRes.data : []);
       } catch {
-        // leave stats null — cards stay in skeleton state
+        if (!cancelled) setLoadError(true);
       }
     })();
+    return () => { cancelled = true; };
   }, [pin]);
 
   const cards = stats
@@ -100,7 +121,9 @@ export default function Dashboard() {
         },
         {
           label: "Comments", value: stats.comments_total,
-          sub: `${stats.comments_pending} pending review`,
+          sub: stats.comments_pending > 0
+            ? `${stats.comments_pending} pending review`
+            : "No pending comments",
           icon: MessageSquare, color: "text-rose-400", href: "/admin/comments",
         },
         {
@@ -143,11 +166,27 @@ export default function Dashboard() {
         >
           <Settings size={16} /> Site Settings
         </Link>
+        <Link
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
+        >
+          <ExternalLink size={16} /> View Site
+        </Link>
       </div>
+
+      {/* Error state */}
+      {loadError && (
+        <div className="flex items-center gap-3 bg-rose-950/50 border border-rose-800 text-rose-300 text-sm px-4 py-3 rounded-xl mb-6">
+          <AlertCircle size={16} className="shrink-0" />
+          Failed to load dashboard stats. Check your connection or PIN and refresh.
+        </div>
+      )}
 
       {/* Stats grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
-        {stats === null
+        {stats === null && !loadError
           ? Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="bg-slate-900 border border-slate-800 rounded-xl p-5 animate-pulse">
                 <div className="h-8 w-16 bg-slate-800 rounded mb-2" />
@@ -191,14 +230,16 @@ export default function Dashboard() {
                   <div className="min-w-0">
                     <p className="text-sm text-slate-200 truncate group-hover:text-white">{p.title}</p>
                     <p className="text-xs text-slate-500">
-                      {p.author_name || "—"} · {new Date(p.createdAt).toLocaleDateString()}
+                      {p.author_name || "Unknown"} · {fmtDate(p.createdAt)}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0 ml-4">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                       p.status === "published"
                         ? "bg-green-900/50 text-green-400"
-                        : "bg-slate-700 text-slate-400"
+                        : p.status === "draft"
+                          ? "bg-slate-700 text-slate-400"
+                          : "bg-yellow-900/50 text-yellow-400"
                     }`}>
                       {p.status}
                     </span>
@@ -235,7 +276,7 @@ export default function Dashboard() {
                 <li key={c._id} className="px-5 py-3 hover:bg-slate-800/50">
                   <p className="text-sm font-medium text-slate-200">{c.authorName}</p>
                   <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">{c.content}</p>
-                  <p className="text-xs text-slate-600 mt-0.5">{new Date(c.createdAt).toLocaleDateString()}</p>
+                  <p className="text-xs text-slate-600 mt-0.5">{fmtDate(c.createdAt)}</p>
                 </li>
               ))}
             </ul>
