@@ -5,14 +5,14 @@ import { useAdminAuth } from "@/app/(admin)/admin/layout";
 import { UploadCloud, Trash2, Copy, CheckCircle, Image as ImageIcon, Loader2 } from "lucide-react";
 
 interface MediaItem {
-  id: number;
+  _id: string;
   filename: string;
   original_name: string;
   mime_type: string;
   size_bytes: number;
   alt: string;
   url: string;
-  created_at: string;
+  createdAt: string;
 }
 
 function fmt(bytes: number) {
@@ -26,9 +26,9 @@ export default function MediaAdmin() {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
-  const [copied, setCopied] = useState<number | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(() =>
@@ -57,7 +57,7 @@ export default function MediaAdmin() {
     setUploading(false);
   };
 
-  const del = async (id: number) => {
+  const del = async (id: string) => {
     if (!confirm("Delete this image permanently?")) return;
     await fetch(`/api/media/${id}`, { method: "DELETE", headers: { "x-admin-pin": pin } });
     await load();
@@ -66,20 +66,20 @@ export default function MediaAdmin() {
 
   const copyUrl = (item: MediaItem) => {
     navigator.clipboard.writeText(item.url);
-    setCopied(item.id);
+    setCopied(item._id);
     setTimeout(() => setCopied(null), 1500);
   };
 
-  const updateAlt = async (id: number, alt: string) => {
+  const updateAlt = async (id: string, alt: string) => {
     await fetch(`/api/media/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", "x-admin-pin": pin },
       body: JSON.stringify({ alt }),
     });
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, alt } : i)));
+    setItems((prev) => prev.map((i) => (i._id === id ? { ...i, alt } : i)));
   };
 
-  const selected = items.find((i) => i.id === selectedId) ?? null;
+  const selected = items.find((i) => i._id === selectedId) ?? null;
 
   return (
     <div className="max-w-6xl">
@@ -131,10 +131,10 @@ export default function MediaAdmin() {
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
               {items.map((item) => (
                 <button
-                  key={item.id}
-                  onClick={() => setSelectedId(selectedId === item.id ? null : item.id)}
+                  key={item._id}
+                  onClick={() => setSelectedId(selectedId === item._id ? null : item._id)}
                   className={`group relative aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
-                    selectedId === item.id ? "border-amber-500" : "border-transparent hover:border-slate-600"
+                    selectedId === item._id ? "border-amber-500" : "border-transparent hover:border-slate-600"
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -165,7 +165,7 @@ export default function MediaAdmin() {
               <label className="block text-xs font-semibold text-slate-400 mb-1">Alt Text</label>
               <input
                 defaultValue={selected.alt}
-                onBlur={(e) => updateAlt(selected.id, e.target.value)}
+                onBlur={(e) => updateAlt(selected._id, e.target.value)}
                 className="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500"
               />
             </div>
@@ -174,12 +174,12 @@ export default function MediaAdmin() {
               <div className="flex gap-1">
                 <input readOnly value={selected.url} className="flex-1 bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-slate-400 font-mono truncate" />
                 <button onClick={() => copyUrl(selected)} className="p-1.5 text-slate-400 hover:text-amber-400 transition-colors" title="Copy URL">
-                  {copied === selected.id ? <CheckCircle size={14} className="text-green-400" /> : <Copy size={14} />}
+                  {copied === selected._id ? <CheckCircle size={14} className="text-green-400" /> : <Copy size={14} />}
                 </button>
               </div>
             </div>
             <button
-              onClick={() => del(selected.id)}
+              onClick={() => del(selected._id)}
               className="flex items-center gap-1.5 w-full justify-center text-xs text-red-400 hover:text-red-300 border border-red-900/50 hover:border-red-700 rounded-lg py-2 transition-colors"
             >
               <Trash2 size={13} /> Delete

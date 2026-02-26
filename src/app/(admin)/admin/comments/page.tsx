@@ -29,6 +29,13 @@ const STATUS_COLORS: Record<string, string> = {
   spam: "bg-red-900/50 text-red-400",
 };
 
+function fmtDateTime(iso: string) {
+  return new Date(iso).toLocaleString("en-PH", {
+    month: "short", day: "numeric", year: "numeric",
+    hour: "numeric", minute: "2-digit",
+  });
+}
+
 export default function CommentsAdmin() {
   const { pin } = useAdminAuth();
   const [result, setResult] = useState<CommentPage | null>(null);
@@ -122,7 +129,7 @@ export default function CommentsAdmin() {
                       </span>
                     </div>
                     <p className="text-slate-300 text-sm leading-relaxed line-clamp-3 mb-1">{c.content}</p>
-                    <p className="text-xs text-slate-600">{new Date(c.createdAt).toLocaleString()}</p>
+                    <p className="text-xs text-slate-600">{fmtDateTime(c.createdAt)}</p>
                   </div>
 
                   {/* Actions */}

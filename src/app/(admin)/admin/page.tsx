@@ -1,4 +1,5 @@
-// /admin redirects to /admin/dashboard via the layout
+import { redirect } from "next/navigation";
+
 export default function AdminRoot() {
-  return null;
+  redirect("/admin/dashboard");
 }

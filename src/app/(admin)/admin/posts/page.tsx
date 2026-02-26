@@ -23,6 +23,12 @@ interface PostsResult {
 
 const LIMIT = 20;
 
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-PH", {
+    month: "short", day: "numeric", year: "numeric",
+  });
+}
+
 export default function PostsList() {
   const { pin } = useAdminAuth();
   const [result, setResult] = useState<PostsResult | null>(null);
@@ -129,16 +135,18 @@ export default function PostsList() {
                     <p className="font-medium text-slate-200 group-hover:text-white line-clamp-1">{p.title}</p>
                     <p className="text-xs text-slate-500 mt-0.5">/{p.slug}</p>
                   </td>
-                  <td className="px-4 py-3 text-slate-400 hidden sm:table-cell">{p.author_name || "—"}</td>
+                  <td className="px-4 py-3 text-slate-400 hidden sm:table-cell">{p.author_name || "Unknown"}</td>
                   <td className="px-4 py-3 text-slate-400 hidden md:table-cell">
-                    {new Date(p.createdAt).toLocaleDateString()}
+                    {fmtDate(p.createdAt)}
                   </td>
                   <td className="px-4 py-3">
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                         p.status === "published"
                           ? "bg-green-900/50 text-green-400"
-                          : "bg-slate-700 text-slate-400"
+                          : p.status === "draft"
+                            ? "bg-slate-700 text-slate-400"
+                            : "bg-yellow-900/50 text-yellow-400"
                       }`}
                     >
                       {p.status}

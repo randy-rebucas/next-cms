@@ -48,6 +48,12 @@ const ROLE_LABELS: Record<Role, { label: string; color: string; icon: React.Reac
   },
 };
 
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-PH", {
+    month: "short", day: "numeric", year: "numeric",
+  });
+}
+
 const EMPTY: Partial<UserRow & { password: string }> = {
   name: "",
   email: "",
@@ -133,6 +139,13 @@ export default function UsersPage() {
 
   return (
     <div className="max-w-4xl">
+      {/* Fixed toast */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-slate-800 border border-slate-700 text-sm text-green-400 px-4 py-2.5 rounded-xl shadow-xl">
+          {toast}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -141,15 +154,12 @@ export default function UsersPage() {
           </h1>
           <p className="text-slate-500 text-sm mt-0.5">Manage admin users and their roles</p>
         </div>
-        <div className="flex items-center gap-3">
-          {toast && <span className="text-xs text-green-400">{toast}</span>}
-          <button
-            onClick={openCreate}
-            className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-          >
-            <Plus size={14} /> Add User
-          </button>
-        </div>
+        <button
+          onClick={openCreate}
+          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+        >
+          <Plus size={14} /> Add User
+        </button>
       </div>
 
       {/* Table */}
@@ -183,7 +193,7 @@ export default function UsersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-slate-500 text-xs">
-                      {new Date(u.createdAt).toLocaleDateString()}
+                      {fmtDate(u.createdAt)}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">

@@ -136,7 +136,7 @@ export default function ToolsPage() {
       <Section title="Site Health" icon={Activity}>
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-slate-400">
-            {health ? `Last checked: ${new Date(health.timestamp).toLocaleTimeString()}` : "Not checked yet"}
+            {health ? `Last checked: ${new Date(health.timestamp).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit", second: "2-digit" })}` : "Not checked yet"}
           </p>
           <button
             onClick={loadHealth}

@@ -24,6 +24,12 @@ interface PagesResult {
 
 const LIMIT = 20;
 
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-PH", {
+    month: "short", day: "numeric", year: "numeric",
+  });
+}
+
 export default function PagesAdmin() {
   const { pin } = useAdminAuth();
   const [result, setResult] = useState<PagesResult | null>(null);
@@ -82,32 +88,32 @@ export default function PagesAdmin() {
         </div>
       ) : (
         <div className="bg-slate-900 border border-slate-800 rounded-xl divide-y divide-slate-800">
-          {pages.map((page) => (
-            <div key={page._id} className="flex items-center gap-4 px-5 py-4">
+          {pages.map((pg) => (
+            <div key={pg._id} className="flex items-center gap-4 px-5 py-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-white text-sm truncate">{page.title}</span>
+                  <span className="font-semibold text-white text-sm truncate">{pg.title}</span>
                   <span
                     className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      page.status === "published"
+                      pg.status === "published"
                         ? "bg-green-900/50 text-green-400"
                         : "bg-amber-900/50 text-amber-400"
                     }`}
                   >
-                    {page.status}
+                    {pg.status}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 mt-1">
-                  <span className="text-xs text-slate-500 font-mono">/{page.slug}</span>
+                  <span className="text-xs text-slate-500 font-mono">/{pg.slug}</span>
                   <span className="text-xs text-slate-600 flex items-center gap-1">
-                    <Clock size={11} /> {new Date(page.updatedAt ?? page.createdAt).toLocaleDateString()}
+                    <Clock size={11} /> {fmtDate(pg.updatedAt ?? pg.createdAt)}
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {page.status === "published" && (
+                {pg.status === "published" && (
                   <a
-                    href={`/${page.slug}`}
+                    href={`/${pg.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2 text-slate-500 hover:text-amber-400 transition-colors"
@@ -117,15 +123,15 @@ export default function PagesAdmin() {
                   </a>
                 )}
                 <Link
-                  href={`/admin/pages/${page._id}/edit`}
+                  href={`/admin/pages/${pg._id}/edit`}
                   className="p-2 text-slate-500 hover:text-white transition-colors"
                   title="Edit"
                 >
                   <Pencil size={15} />
                 </Link>
                 <button
-                  onClick={() => del(page._id, page.title)}
-                  disabled={deleting === page._id}
+                  onClick={() => del(pg._id, pg.title)}
+                  disabled={deleting === pg._id}
                   className="p-2 text-slate-500 hover:text-red-400 transition-colors disabled:opacity-40"
                   title="Delete"
                 >
